@@ -1,0 +1,29 @@
+==========================================================
+==============Install the Nagios plugin for i=============
+==========================================================
+----------------------------------------------------------
+1.	Extract the Nagios for i plugin to the directory: /usr/local/nagios/
+----------------------------------------------------------
+	# tar xvf nagios-plugin-for-IBM-i.tar.gz -C /usr/local/nagios/
+
+----------------------------------------------------------
+2.	Execute the below command:
+----------------------------------------------------------
+	# /bin/bash /usr/local/nagios/libexec/ibmi_init.sh. 
+	It will initialize the IBM i related commands, services and templates into the configuration files. 
+
+----------------------------------------------------------
+3.	Issue below command to add the user name and password of the system that you would like to monitor (you can use –h option to see the help):
+----------------------------------------------------------
+	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i [host | sst]
+	e.g. Add an user profile for IBM i server
+	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i host
+
+	Add an user profile for SST
+	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i sst 
+
+----------------------------------------------------------
+4.	Start the server of plugin for i and restart the nagios service
+----------------------------------------------------------
+	# /bin/bash /usr/local/nagios/libexec/server_start.sh
+	# service nagios restart

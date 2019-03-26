@@ -1,0 +1,231 @@
+﻿Install and configure guidelines for linux Redhat and CentOS.
+It's strongly recommended to install the Nagios on a clean system.
+
+==========================================================
+====================Install Nagios Core===================
+==========================================================
+----------------------------------------------------------
+1.	Install LAMP Environment (Linux, Apache, MySQL, PHP)
+----------------------------------------------------------
+    # yum -y install httpd mysql mysql-server php php-mysql postgresql postgresql-server php-postgresql php-pgsql php-devel
+
+    #service httpd restart
+
+----------------------------------------------------------
+2.	Create users and user groups for Nagios Core
+----------------------------------------------------------
+    # useradd nagios
+    # passwd nagios
+    # groupadd nagcmd
+    # usermod -a -G nagcmd nagios
+    # usermod -a -G nagcmd apache
+
+----------------------------------------------------------
+3.	Install Nagios core
+----------------------------------------------------------
+    # cd /opt/
+    # wget http://prdownloads.sourceforge.net/sourceforge/nagios/nagios-4.1.1.tar.gz
+    # tar xzf nagios-4.1.1.tar.gz
+    # cd nagios-4.1.1
+    # ./configure --with-command-group=nagcmd（If the gcc is not installed, please use ‘yum install gcc’ to install gcc first）.
+    # make all
+    # make install
+    # make install-init
+    # make install-config
+    # make install-commandmode
+    # make install-webconf
+
+----------------------------------------------------------
+4.	Configure Apache Authentication
+----------------------------------------------------------
+    # htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+
+----------------------------------------------------------
+5.	Restart the Apache Service so that configurations can be applied
+----------------------------------------------------------
+    # service httpd restart 
+    If you meet the problem that apache cannot be started, you could try ‘/bin/systemctl restart httpd.service’ instead. 
+
+----------------------------------------------------------
+6.	Install General Plugins for Nagios
+----------------------------------------------------------
+    Download:
+    # cd /opt
+    # wget http://nagios-plugins.org/download/nagios-plugins-2.1.1.tar.gz
+    # tar xzf nagios-plugins-2.1.1.tar.gz
+    # cd nagios-plugins-2.1.1
+    Install:
+    # ./configure --with-nagios-user=nagios --with-nagios-group=nagios
+    # make
+    # make install
+
+----------------------------------------------------------
+7.	Check the Nagios installation and start the Nagios Core
+----------------------------------------------------------
+    # /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+    # service nagios start
+
+----------------------------------------------------------
+8.	Access Nagios Core by http://IP_ADDRESS/nagios/
+----------------------------------------------------------
+
+==========================================================
+====================Install pnp4nagios====================
+==========================================================
+----------------------------------------------------------
+1.	Install rrdtool
+----------------------------------------------------------
+    # yum -y install gcc cairo-devel libxml2-devel pango-devel pango libpng-devel freetype freetype-devel libart_lgpl-devel
+    # yum install -y rrdtool perl-rrdtool perl-Time-HiRes
+
+----------------------------------------------------------
+2.	Download pnp4nagio installation package
+----------------------------------------------------------
+    # cd /opt
+    # wget http://jaist.dl.sourceforge.net/project/pnp4nagios/PNP-0.6/pnp4nagios-0.6.25.tar.gz
+    # tar -zxvf pnp4nagios-0.6.25.tar.gz
+    # cd pnp4nagios-0.6.25
+
+----------------------------------------------------------
+3.	Install pnp4nagios
+----------------------------------------------------------
+    # ./configure --prefix=/usr/local/pnp4nagios --with-nagios-user=nagios --with-rrdtool=/usr/bin/rrdtool
+    # make all
+    # make fullinstall
+
+----------------------------------------------------------
+4.	Configure pnp4nagios
+----------------------------------------------------------
+    # cd /usr/local/pnp4nagios/etc/
+    # mv misccommands.cfg-sample misccommands.cfg
+    # mv nagios.cfg-sample nagios.cfg
+    # mv rra.cfg-sample rra.cfg
+
+    # cd /usr/local/pnp4nagios/etc/pages/
+    # mv web_traffic.cfg-sample web_traffic.cfg
+
+    # cd /usr/local/pnp4nagios/etc/check_commands/
+    # mv check_all_local_disks.cfg-sample check_all_local_disks.cfg
+    # mv check_nrpe.cfg-sample check_nrpe.cfg
+    # mv check_nwstat.cfg-sample check_nwstat.cfg
+
+----------------------------------------------------------
+5.	Start pnp4nagios
+----------------------------------------------------------
+    # /etc/init.d/npcd start
+
+    Configure pnp4nagios to be started on every reboot of the system:
+    # chkconfig npcd on
+
+    Restart Apache
+    #service httpd restart
+
+    You can try the URL: http://IP_ADDRESS/pnp4nagios/ . If you see the page with no error message, it means that pnp4nagios has been correctly configured.
+
+    If you meet an error of “session_start(): open(/var/lib/php/session/sess_fnbu9s6o2pphg2dblq37jbo921, O_RDWR) failed: Permission denied”, it means PNP4Nagios has no access to the directory “/var/lib/php/session”. We need to change the owner by following command:
+    # chown nagios:nagios -R /var/lib/php/
+
+    If you meet an error of “perfdata directory “/usr/local/pnp4nagios/var/perfdata/ is empty. Please check your Nagios config” after refresh the page, it means we need to config the Nagios configuration files to redirect the performance data to PNP4nagios. We will configure it in following steps(Configure Nagios -> Configure commands.cfg).
+
+==========================================================
+=====================Configure Nagios=====================
+==========================================================
+----------------------------------------------------------
+1.	Configure /usr/local/nagios/etc/nagios.cfg
+----------------------------------------------------------
+    1). Change the process_performance_data to 1:
+    process_performance_data = 1, this will enable the Nagios performance data output.
+
+    2). Add below lines at the bottom of the file nagios.cfg:
+    # service performance data
+    service_perfdata_file=/usr/local/pnp4nagios/var/service-perfdata
+    service_perfdata_file_template=DATATYPE::SERVICEPERFDATA\tTIMET::$TIMET$\tHOSTNAME::$HOSTNAME$\tSERVICEDESC::$SERVICEDESC$\tSERVICEPERFDATA::$SERVICEPERFDATA$\tSERVICECHECKCOMMAND::$SERVICECHECKCOMMAND$\tHOSTSTATE::$HOSTSTATE$\tHOSTSTATETYPE::$HOSTSTATETYPE$\tSERVICESTATE::$SERVICESTATE$\tSERVICESTATETYPE::$SERVICESTATETYPE$
+    service_perfdata_file_mode=a
+    service_perfdata_file_processing_interval=15
+    service_perfdata_file_processing_command=process-service-perfdata-file
+     
+    # host performance data starting with Nagios 3.0
+    host_perfdata_file=/usr/local/pnp4nagios/var/host-perfdata
+    host_perfdata_file_template=DATATYPE::HOSTPERFDATA\tTIMET::$TIMET$\tHOSTNAME::$HOSTNAME$\tHOSTPERFDATA::$HOSTPERFDATA$\tHOSTCHECKCOMMAND::$HOSTCHECKCOMMAND$\tHOSTSTATE::$HOSTSTATE$\tHOSTSTATETYPE::$HOSTSTATETYPE$
+    host_perfdata_file_mode=a
+    host_perfdata_file_processing_interval=15
+    host_perfdata_file_processing_command=process-host-perfdata-file
+
+    3). Add following lines:
+    cfg_file=/usr/local/nagios/etc/objects/hosts.cfg
+    cfg_file=/usr/local/nagios/etc/objects/services.cfg
+
+----------------------------------------------------------
+2.	Create file hosts.cfg and service.cfg
+----------------------------------------------------------
+    1). Create file hosts.cfg under /usr/local/nagios/etc/objects/ directory. You can take hosts.cfg.sample for reference or just rename and edit it. Below is an example of the content:
+    define host{
+        use generic-test,host-pnp
+        host_name HOST_NAME_1
+        address IP_ADDRESS_1
+    }
+    define host{
+        use generic-test,host-pnp
+        host_name HOST_NAME_2
+        address IP_ADDRESS_2
+    }
+    define hostgroup{
+        hostgroup_name  group1(mapping with the host group name in services.cfg)
+        alias group1
+        members HOST_NAME_1, HOST_NAME_2
+    }
+
+    2). Create file services.cfg under /usr/local/nagios/etc/objects/ directory. You can take services.cfg.sample for reference or just rename and edit it. Below is an example of the content:
+    define service{
+        use generic-service,srv-pnp
+        hostgroup_name group1(mapping with the host group name in hosts.cfg)
+        service_description SERVICE_DESCRIPTION
+        check_command CHECK_COMMAND!$ARG1$!$ARG2$!$ARG3$
+    }
+
+----------------------------------------------------------
+3.	Configure /usr/local/nagios/etc/objects/commands.cfg
+----------------------------------------------------------
+    Add below lines into the file:
+    define command{
+        command_name    process-service-perfdata-file
+        command_line    /bin/mv /usr/local/pnp4nagios/var/service-perfdata /usr/local/pnp4nagios/var/spool/service-perfdata.$TIMET$
+    }
+    define command{
+        command_name    process-host-perfdata-file
+        command_line    /bin/mv /usr/local/pnp4nagios/var/host-perfdata /usr/local/pnp4nagios/var/spool/host-perfdata.$TIMET$
+    }
+
+    In the mean time, you need to comment out the original defined ‘process-host-perfdata’ and ‘process-service-perfdata’.
+
+----------------------------------------------------------
+4.	Configure /usr/local/nagios/etc/objects/templates.cfg
+----------------------------------------------------------
+    Add below content into the file:
+
+    define host {
+        name            host-pnp
+        action_url      /pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=_HOST_’ class=’tips’ rel=’/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=_HOST_
+        register        0
+    }
+    define service {
+        name            srv-pnp
+        action_url      /pnp4nagios/index.php/graph?host=$HOSTNAME$&srv=$SERVICEDESC$’ class=’tips’ rel=’/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=$SERVICEDESC$
+        register        0
+    }
+    define host {
+        name            srv-pnp
+        action_url      /pnp4nagios/graph?host=$HOSTNAME$&srv=_HOST_
+        register        0
+    }
+    define service {
+        name            services-pnp
+        action_url      /pnp4nagios/graph?host=$HOSTNAME$&srv=$SERVICEDESC$ 
+        register        0
+    }
+    PS: If you use the hosts.cfg.sample, the template of generic-test should be added. You can take templates.cfg.sample for reference.
+
+----------------------------------------------------------
+5.	Restart Nagios Service
+----------------------------------------------------------
+    # service nagios restart

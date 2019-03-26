@@ -1,0 +1,108 @@
+<pcml version="1.0">
+
+	<struct name="listInfo">
+		<data name="totalRcds"    type="int"  length="4"  />
+		<data name="rcdsReturned" type="int"  length="4"  />
+		<data name="rqsHandle"    type="byte" length="4"  />
+		<data name="rcdLength"    type="int"  length="4"  />
+		<data name="infoComplete" type="char" length="1"  />
+		<data name="dateCreated"  type="char" length="7"  />
+		<data name="timeCreated"  type="char" length="6"  />
+		<data name="listStatus"   type="char" length="1"  />
+		<data                     type="byte" length="1"  />
+		<data name="lengthOfInfo" type="int"  length="4"  />
+		<data name="firstRecord"  type="int"  length="4"  />
+		<data                     type="byte" length="40" />
+	</struct>
+
+	<struct name="fieldInfo">
+	  <data name="offsetToNextField" type="int"  length="4"  />
+	  <data name="lengthOfFieldInfo" type="int"  length="4"  />
+	  <data name="keyField"          type="int"  length="4"  />
+	  <data name="typeOfData"        type="char" length="1"  />
+	  <data name="statusOfData"      type="char" length="1"  />
+	  <data name="reserved"          type="byte" length="14" />
+	  <data name="lengthOfData"      type="int"  length="4"  />
+	  <data name="keyData"           type="byte" length="lengthOfData"  />
+	  <data                          type="byte" length="0" offset="lengthOfFieldInfo"  offsetfrom="fieldInfo" />
+	</struct>
+	    
+	<struct name="lstm0100">
+	  <struct name="msgEntry" count="listInfo.rcdsReturned" >
+		<data name="offsetToNextEntry"   type="int"  length="4"  />
+		<data name="offsetToFields"      type="int"  length="4"  />
+		<data name="nbrOfFields"         type="int"  length="4"  />
+		<data name="msgSeverity"         type="int"  length="4"  />
+		<data name="msgID"               type="char" length="7"  />
+		<data name="msgType"             type="char" length="2"  />
+		<data name="msgKey"              type="byte" length="4"  />
+		<data name="msgFile"             type="char" length="10" />
+		<data name="msgFileLibrary"      type="char" length="10" />
+		<data name="msgQueue"            type="char" length="10" />
+		<data name="msgQueueLibrary"     type="char" length="10" />
+		<data name="dateSent"            type="char" length="7"  />
+		<data name="timeSent"            type="char" length="6"  />
+	    <data name="microseconds"        type="char" length="6"  minvrm="V5R2M0" />
+		<data name="fieldInfo"           type="struct" struct="fieldInfo" count="nbrOfFields" usage="output" offset="offsetToFields"  offsetfrom="lstm0100" />
+		<data                            type="byte" length="0" offset="offsetToNextEntry"  offsetfrom="lstm0100" />
+	  </struct>
+	</struct>
+
+
+	<struct name="userOrQueueInfo">
+		<data name="userOrQueueIndicator"  type="char" length="1"  init="0"  />
+		<data name="userOrQueueName"       type="char" length="20" init="*CURRENT            "  />
+	</struct>
+	
+	<struct name="msgQueuesUsed">
+		<data name="nbrQueues"           type="int"  length="4"   usage="output" />
+		<data name="msgQueueName1"       type="char" length="20"  usage="output" />
+		<data name="msgQueueName2"       type="char" length="20"  usage="output" />
+	</struct>
+
+	<struct name="msgSelInfo">
+		<data name="listDirection"       type="char" length="10"  init="*NEXT     " />
+		<data name="reserved"            type="char" length="2"   init="  "   />
+		<data name="severity"            type="int"  length="4"   init="0"    />
+		<data name="maxMsgLength"        type="int"  length="4"   init="511"  />
+		<data name="maxMsgHelpLength"    type="int"  length="4"   init="3000" />
+		<data name="offsetToSelCriteria" type="int"  length="4"   init="44"   />
+		<data name="nbrOfSelCriteria"    type="int"  length="4"   init="1"    />
+		<data name="offsetToMsgKeys"     type="int"  length="4"   init="54"   />
+		<data name="offsetToFldsToReturn" type="int" length="4"   init="62"   />
+		<data name="nbrOfFldsToReturn"   type="int"  length="4"   init="3"    />
+		<data name="selectionCriteria"   type="char" length="10"  count="nbrOfSelCriteria"  offset="offsetToSelCriteria"  offsetfrom="msgSelInfo" />
+		<data name="messageKeys"         type="byte" length="4"   count="2"                 offset="offsetToMsgKeys"      offsetfrom="msgSelInfo" />
+		<data name="fldsToReturn"        type="int"  length="4"   count="nbrOfFldsToReturn" offset="offsetToFldsToReturn" offsetfrom="msgSelInfo" />
+	</struct>
+
+	<program name="qgyolmsg" path="/QSYS.LIB/QGY.LIB/QGYOLMSG.PGM" parseorder="listInfo lstm0100 msgQueuesUsed" >
+		<data name="lstm0100"           type="struct" struct="lstm0100"      usage="output" outputsize="receiverLength"  />
+		<data name="receiverLength"     type="int"    length="4"             usage="input" init="32768" />
+		<data name="listInfo"           type="struct" struct="listInfo"      usage="output"             />
+		<data name="rcdsToReturn"       type="int"    length="4"             usage="input"  init="-1"   />
+		<data name="sortIndicator"      type="char"   length="1"             usage="input"  init="1"    />
+		<data name="msgSelInfo"         type="struct" struct="msgSelInfo"    usage="input"              />
+		<data name="sizeMsgSelInfo"     type="int"    length="4"             usage="input"  init="74"   />
+		<data name="userOrQueueInfo"    type="struct" struct="userOrQueueInfo"  usage="input"           />
+		<data name="msgQueuesUsed"      type="struct" struct="msgQueuesUsed" usage="output"             />
+		<data name="errorCode"          type="int"    length="4"             usage="input" init="0"     />
+	</program>
+	
+	<program name="qgygtle" path="/QSYS.LIB/QGY.LIB/QGYGTLE.PGM" parseorder="listInfo lstm0100 ">
+	  <data   name="lstm0100"       type="struct" struct="lstm0100" usage="output" outputsize="receiverLength"  />
+	  <data   name="receiverLength" type="int"    length="4"        usage="input"  init="32768" />
+	  <data   name="requestHandle"  type="byte"   length="4"        usage="input"  />
+	  <data   name="listInfo"       type="struct" struct="listInfo" usage="output" />
+	  <data   name="rcdsToReturn"   type="int"    length="4"        usage="input" init="100" />
+	  <data   name="startRecord"    type="int"    length="4"        usage="input"  />
+	  <data   name="errorCode"      type="int"    length="4"        usage="input" init="0"   />
+	</program>
+
+	<program name="qgyclst" path="/QSYS.LIB/QGY.LIB/QGYCLST.PGM">
+	  <data   name="closeHand"      type="byte"   length="4"        usage="input"  />
+	  <data	  name="errorCode"      type="int"    length="4"        usage="input" init="0" />
+	</program>
+	
+</pcml>
+

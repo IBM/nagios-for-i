@@ -1,0 +1,100 @@
+=========================================================
+README file for Nagios for IBM i Version: 2.0
+=========================================================
+
+INSTALL
+---------------------------
+1) If you do not have Nagios core installed on your system, you need to follow the instructions in 'Nagios Core Install and Configure Guidelines' to install Nagios core first. Otherwise, you can skip this step. 
+
+2) To install the IBM i plug-in to the Nagios core, please follow the instructions in 'Nagios Plugin for IBM i Install and Configure Guidelines'. 
+
+After installing the plug-in, you can take the file hosts.cfg.sample, services.cfg.sample and templates.cfg.sample as a reference to configure your Nagios instance, or you could just rename the files.
+
+TOOLS
+---------------------------
+ibmi_init.sh: Initialize the commands for checking IBM i and Daemon Server service on localhost(Only available for Nagios Core).
+
+host_config.sh: Manage the endpoint server's address and user profile. For more information refer to the help list by running the shell script host_config.sh with option -h.
+
+server_start.sh: Start the daemon server for Nagios for i and Nagios Core service.
+
+server_stop.sh: Stop the daemon server for Nagios for i and Nagios Core service.
+
+server_restart.sh: Restart the daemon server for Nagios for i and Nagios Core service.
+
+COMMANDS
+---------------------------
+The commands automatic initialization only available for Nagios Core for now. For Naigos XI, users can only initialize the commands manually using the Nagios XI's CCM(Core Config Manager) GUI interface.
+Notice that the parameter -M is case sensitive
+
+command_name    check-ibmi-cpu-utilization
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M CPU -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-active-job-num
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M ActiveJobs -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-disk-config
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M DiskConfig -H $HOSTADDRESS$
+
+command_name	check-ibmi-disk-usage
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M DiskUsage -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-asp-usage
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M ASPUsage -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-message
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M Message -H $HOSTADDRESS$ -lib $ARG1$ -name $ARG2$ -ty $ARG3$ -W $ARG4$ -C $ARG5$
+
+command_name	check-ibmi-page-faults
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M PageFaults -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-subsystem-jobs
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M SubsystemJobs -H $HOSTADDRESS$ -S $ARG1$(Subsystem Name) -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-temp-storage-jobs
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M TempStorageJobs -H $HOSTADDRESS$ -N $ARG1$(Number of jobs want to retrieve)
+
+command_name	check-ibmi-long-run-sql
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M LogRunSQL -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-cur-logon-users
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M CurSignOnUsers -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-specific-job-cpu
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M SpecificJobCPU -H $HOSTADDRESS$ -J $ARG1$(Job Name) -W $ARG2$ -C $ARG3$
+
+command_name	check-ibmi-cpu-overload-jobs-num
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M CPUOverloadJobs -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+
+command_name	check-ibmi-specific-message
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M SpecificMessage -H $HOSTADDRESS$ -I $ARG1$(Message ID. Support CPF*. Multiple IDs split by ',' such as CPFxxx1,CPFxxx2,CPFXXX3)
+
+command_name	check-ibmi-basic-info
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M BasicInfo -H $HOSTADDRESS$
+
+command_name	check-nagios-daemon-server
+command_line	/bin/bash $USER1$/check_daemon_status.sh -M DaemonServer
+
+command_name    custom-sql
+command_line    /bin/bash /usr/local/nagios/libexec/check_ibmi_status.sh -M CustomSQL -H $HOSTADDRESS$ -F $ARG1$ -W $ARG2$ -C $ARG3$
+
+ENVIRONMENT REQUIREMENTS
+---------------------------
+GROUP PTF
+V7R1: SF99701 LEVEL 38
+V7R2: SF99702 LEVEL 16
+V7R3: SF99703 LEVEL 4
+
+USER PROFILE
+check-ibmi-long-run-sql needs *ALLOBJ
+check-ibmi-disk-config  needs *ALLOBJ,*SERVICE,*IOSYSCFG
+
+PORT
+as-central	8470
+as-database	8471
+as-dtaq		8472
+as-file		8473
+as-netprt	8474
+as-rmtcmd	8475
+as-signon	8476
+as-svrmap	449
