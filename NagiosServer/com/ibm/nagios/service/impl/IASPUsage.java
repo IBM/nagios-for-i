@@ -47,29 +47,30 @@ public class IASPUsage implements Action {
 				return returnValue;
 			}
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT DEVICE_DESCRIPTION_NAME, ASP_NUMBER, ASP_STATE, ASP_TYPE, TOTAL_CAPACITY, TOTAL_CAPACITY_AVAILABLE FROM QSYS2.ASP_INFO");
+			rs = stmt.executeQuery("SELECT DEVICE_DESCRIPTION_NAME, ASP_NUMBER, ASP_STATE, ASP_TYPE, TOTAL_CAPACITY, TOTAL_CAPACITY_AVAILABLE FROM QSYS2.ASP_INFO WHERE ASP_NUMBER>32");
 			if(rs == null) {
 				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
+				IASPNum++;
 				aspNum = rs.getInt("ASP_NUMBER");
-				if(aspNum > 32) {
-					IASPNum++;
-					description = rs.getString("DEVICE_DESCRIPTION_NAME");
-					state = rs.getString("ASP_STATE");
-					type = rs.getString("ASP_TYPE");
-					totalCapacity = rs.getLong("TOTAL_CAPACITY");
-					capacityAvailable = rs.getLong("TOTAL_CAPACITY_AVAILABLE");
-					percentUsed = (double)capacityAvailable/(double)totalCapacity;
-					
-					maxIASPUsgVal = percentUsed>maxIASPUsgVal ? percentUsed : maxIASPUsgVal;
-					returnValue = CommonUtil.getStatus(percentUsed, doubleWarningCap, doubleCriticalCap, returnValue);
-					response.append("'IASP " + aspNum + "'= " + usageFormat.format(percentUsed/100) + ";" + doubleWarningCap + ";" + doubleCriticalCap);
-				}
+				description = rs.getString("DEVICE_DESCRIPTION_NAME");
+				state = rs.getString("ASP_STATE");
+				type = rs.getString("ASP_TYPE");
+				totalCapacity = rs.getLong("TOTAL_CAPACITY");
+				capacityAvailable = rs.getLong("TOTAL_CAPACITY_AVAILABLE");
+				percentUsed = (double)capacityAvailable/(double)totalCapacity;
+				
+				maxIASPUsgVal = percentUsed>maxIASPUsgVal ? percentUsed : maxIASPUsgVal;
+				returnValue = CommonUtil.getStatus(percentUsed, doubleWarningCap, doubleCriticalCap, returnValue);
+				response.append("'IASP " + aspNum + "'= " + usageFormat.format(percentUsed/100) + ";" + doubleWarningCap + ";" + doubleCriticalCap);
 			}
 			if(IASPNum == 0) {
 				response.insert(0, "IASP not found");
+			} else if(returnValue == StatusConstants.UNKNOWN) {
+				response.setLength(0);
+				response.append("IASP state not right: " + state);
 			} else {
 				response.insert(0, "Highest IASP Usage: " + usageFormat.format(maxIASPUsgVal/100) + " | ");
 			}

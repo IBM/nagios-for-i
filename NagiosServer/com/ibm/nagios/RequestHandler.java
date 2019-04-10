@@ -6,6 +6,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.AS400Connection;
 import com.ibm.nagios.util.ActionFactory;
+import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.StatusConstants;
 
 public class RequestHandler {
@@ -26,8 +27,7 @@ public class RequestHandler {
 			}
 			String systemName = args.get("-H");
 			String user = args.get("-U");
-			ActionFactory actionFactory = new ActionFactory();
-			Action action = actionFactory.get(metric);
+			Action action = ActionFactory.get(metric);
 			retVal = action.execute(as400, args, response);
 			if(as400 != null) {
 				// TODO maybe need a better way to generate the key
@@ -35,6 +35,8 @@ public class RequestHandler {
 			}
 		} catch(Exception e) {
 			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			CommonUtil.printStack(e.getStackTrace(), response);
+			e.printStackTrace();
 		}
 		return retVal;
 	}

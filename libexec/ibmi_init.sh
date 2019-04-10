@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp /usr/local/nagios/libexec/server.jar com.ibm.nagios.config.Initialization
+java -cp /usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.Initialization

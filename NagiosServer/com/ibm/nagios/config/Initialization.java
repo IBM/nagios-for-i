@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*
+ * used for initializing Nagios core configuration files. 
+ */
 public class Initialization {
 	private final static String OBJECTS = "/usr/local/nagios/etc/objects/";
 	private final static String COMMANDS_CFG = "commands.cfg";

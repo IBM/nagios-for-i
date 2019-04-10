@@ -15,21 +15,16 @@ import com.ibm.nagios.config.util.UserInfo;
  */
 public class HostConfigInfo {
 	private final static String CUST_PROFILE = "/usr/local/nagios/profile.csv";
-	//private final static String FILENAME = "C:/Users/IBM_ADMIN/Desktop/Nagios/Nagios.host.java.config.ser";
-//	private static HashMap<String, HashMap<String, UserInfo>> cache = new HashMap<String, HashMap<String, UserInfo>>();
 	private static HashMap<String, UserInfo> hosts = null;
 	private static HashMap<String, UserInfo> sst = null;
-	
-	public HostConfigInfo() {
-		
-	}
-	
-	public boolean load() {
+
+	public static boolean load() {
 		try {
 			HostConfig.load();
 			hosts = HostConfig.getHosts();
 			sst = HostConfig.getSST();
 	        
+			//bulk load: load profile information from profile.csv
 	        File customUserProfile = new File(CUST_PROFILE);
 	        if(customUserProfile.isFile() && customUserProfile.exists()) {
 	        	InputStreamReader read = new InputStreamReader(

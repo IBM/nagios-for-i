@@ -13,18 +13,20 @@ public class JDBCConnection {
 	
 	public Connection getJDBCConnection(String system, String userID, String password, String ssl) throws ConnectionPoolException {
 		AS400JDBCConnectionPool pool = null;
-		AS400JDBCConnectionPoolDataSource dataSource = new AS400JDBCConnectionPoolDataSource(system, userID, password);
+		
 		if(ssl!=null && ssl.equalsIgnoreCase("Y")) {
 			pool = SecureJDBCPool.get(system);
 			if(pool == null) {
+				AS400JDBCConnectionPoolDataSource dataSource = new AS400JDBCConnectionPoolDataSource(system, userID, password);
 				dataSource.setSecure(true);
 				pool = new AS400JDBCConnectionPool(dataSource);
-				pool.setMaxConnections(12);
+				pool.setMaxLifetime(1000*60*30);
 				SecureJDBCPool.put(system, pool);
 			}
 		} else {
 			pool = JDBCPool.get(system);
 			if(pool == null) {
+				AS400JDBCConnectionPoolDataSource dataSource = new AS400JDBCConnectionPoolDataSource(system, userID, password);
 				pool = new AS400JDBCConnectionPool(dataSource);
 				pool.setMaxConnections(12);
 				JDBCPool.put(system, pool);

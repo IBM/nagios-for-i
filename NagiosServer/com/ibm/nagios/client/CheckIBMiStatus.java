@@ -54,10 +54,8 @@ public class CheckIBMiStatus {
 			try {
 				String metric = argsMap.get("-M");
 				String system = argsMap.get("-H");
-				ActionFactory actionFactory = new ActionFactory();
-				Action action = actionFactory.get(metric);
-				HostConfigInfo host = new HostConfigInfo();
-				if(!host.load()) {
+				Action action = ActionFactory.get(metric);
+				if(!HostConfigInfo.load()) {
 					System.err.println("load file Nagios.host.java.config.ser error");
 					System.exit(retValue);
 				}
@@ -78,6 +76,7 @@ public class CheckIBMiStatus {
 					as400 = new AS400(system, user, password);
 				}
 				as400.setGuiAvailable(false);
+				as400.validateSignon();
 				StringBuffer response = new StringBuffer();
 				retValue = action.execute(as400, argsMap, response);
 				System.out.println(response);

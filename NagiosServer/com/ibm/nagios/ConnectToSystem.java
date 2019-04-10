@@ -30,7 +30,8 @@ public class ConnectToSystem implements Runnable {
 			HashMap<String, String> args = (HashMap<String, String>) ois.readObject();
 			String systemName = args.get("-H");
 			if(systemName == null) {	//check daemon server status
-				Server.metricPool.execute(new CheckIBMiStatus(null, socket, args));
+				CheckIBMiStatus check = new CheckIBMiStatus(null, socket, args);
+				check.run();
 			}
 			else {	//check IBM i status
 				//load user profile and password from Nagios.host.java.config.ser
@@ -52,7 +53,9 @@ public class ConnectToSystem implements Runnable {
 				}
 				else {
 					as400.setGuiAvailable(false);
-					Server.metricPool.execute(new CheckIBMiStatus(as400, socket, args));
+//					Server.metricPool.execute(new CheckIBMiStatus(as400, socket, args));
+					CheckIBMiStatus check = new CheckIBMiStatus(as400, socket, args);
+					check.run();
 				}
 			}
 		} catch (Exception e) {

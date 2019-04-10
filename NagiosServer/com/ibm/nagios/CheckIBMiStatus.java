@@ -8,9 +8,8 @@ import java.net.Socket;
 import java.util.Map;
 
 import com.ibm.as400.access.AS400;
-import com.ibm.nagios.service.WorkerThread;
 
-public class CheckIBMiStatus extends WorkerThread {
+public class CheckIBMiStatus {
 	AS400 as400;
 	Socket socket;
 	Map<String, String> args;
@@ -20,8 +19,6 @@ public class CheckIBMiStatus extends WorkerThread {
 		this.socket = socket;
 		this.args = args;
 	}
-	
-	
 	
 	public void run() {
 		try {
