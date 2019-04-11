@@ -10,14 +10,14 @@ import java.util.HashMap;
 
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.SecureAS400;
+import com.ibm.nagios.Server;
 import com.ibm.nagios.config.util.Base64Coder;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.ActionFactory;
 import com.ibm.nagios.util.HostConfigInfo;
 
 public class CheckIBMiStatus {
-	private static final int PORT = 8888;
-	private static final String SERVER = "localhost";
+	public static final String SERVER = "localhost";
 	
 	private static HashMap<String, String> argsMap = new HashMap<String, String>();
 	
@@ -33,7 +33,7 @@ public class CheckIBMiStatus {
 		int retValue = UNKNOWN;
 		try {
 			ParseArgs(args);
-			socket = new Socket(SERVER, PORT);
+			socket = new Socket(SERVER, Server.PORT);
 			socket.setReuseAddress(true);
 			socket.setSoLinger(true, 0);
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());

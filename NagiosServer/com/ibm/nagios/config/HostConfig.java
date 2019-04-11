@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.ibm.nagios.Server;
+import com.ibm.nagios.client.CheckIBMiStatus;
 import com.ibm.nagios.config.util.Base64Coder;
 import com.ibm.nagios.config.util.UserInfo;
 
@@ -106,31 +109,35 @@ public class HostConfig {
 					sst.put(hostAddr, new UserInfo(userID, Base64Coder.encodeString(password)));
 				}
 				if(save()) {
+					refreshProfile();
 					return true;
 				}
 			}
         }
         catch (Exception e) {
-        	System.out.println(e.toString());
+        	e.printStackTrace();
         }
 		return false;
 	}
 	
 	private static boolean remove(String hostAddr, String type) {
 		try {
-			load();
-			if(type.equalsIgnoreCase("host")) {
-				hosts.remove(hostAddr);
+			if(load()) {
+				if(type.equalsIgnoreCase("host")) {
+					hosts.remove(hostAddr);
+				}
+				else if(type.equalsIgnoreCase("sst")) {
+					sst.remove(hostAddr);
+				}
+				if(save()) {
+					refreshProfile();
+					return true;
+				}
 			}
-			else if(type.equalsIgnoreCase("sst")) {
-				sst.remove(hostAddr);
-			}
-			save();
 		} catch (Exception e) {
-			System.out.println(e.toString());
-			return false;
+			e.printStackTrace();
 		}
-		return true;
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -209,5 +216,19 @@ public class HostConfig {
 		System.out.println("-d [host | sst] Delete a host");
 		System.out.println("   host: Remove an AS400   sst: Remove a SST");
 		System.out.println("-a List all the hosts");
+	}
+	
+	private static void refreshProfile() {
+		try {
+			Socket socket = new Socket(CheckIBMiStatus.SERVER, Server.PORT);
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			HashMap<String, String> argsMap = new HashMap<String, String>();
+			argsMap.put("-M", "RefreshProfile");
+			oos.writeObject(argsMap);
+			socket.close();
+		} catch (Exception e) {
+			//The daemon server might not active
+		}
+		
 	}
 }

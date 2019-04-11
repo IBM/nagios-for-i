@@ -29,9 +29,14 @@ public class ConnectToSystem implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream(is);
 			HashMap<String, String> args = (HashMap<String, String>) ois.readObject();
 			String systemName = args.get("-H");
-			if(systemName == null) {	//check daemon server status
-				CheckIBMiStatus check = new CheckIBMiStatus(null, socket, args);
-				check.run();
+			if(systemName == null) {
+				String metric = args.get("-M");
+				if(metric.equalsIgnoreCase("DaemonServer")) {	//check daemon server status
+					CheckIBMiStatus check = new CheckIBMiStatus(null, socket, args);
+					check.run();
+				} else if(metric.equalsIgnoreCase("RefreshProfile")) {//reload HostConfigInfo
+					HostConfigInfo.load();
+				}
 			}
 			else {	//check IBM i status
 				//load user profile and password from Nagios.host.java.config.ser

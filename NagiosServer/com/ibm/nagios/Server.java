@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import com.ibm.nagios.util.HostConfigInfo;
 
 public class Server {
-	private static final int PORT = 8888;
+	public static final int PORT = 8888;
 	
 	public static ExecutorService workers = Executors.newCachedThreadPool();
 	
