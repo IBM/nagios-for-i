@@ -15,10 +15,9 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.ibm.nagios.Server;
-import com.ibm.nagios.client.CheckIBMiStatus;
 import com.ibm.nagios.config.util.Base64Coder;
 import com.ibm.nagios.config.util.UserInfo;
+import com.ibm.nagios.util.Constants;
 
 public class HostConfig {
 	private final static String DIRECTORY = "/usr/local/nagios/";
@@ -220,7 +219,7 @@ public class HostConfig {
 	
 	private static void refreshProfile() {
 		try {
-			Socket socket = new Socket(CheckIBMiStatus.SERVER, Server.PORT);
+			Socket socket = new Socket(Constants.SERVER, Constants.PORT);
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			HashMap<String, String> argsMap = new HashMap<String, String>();
 			argsMap.put("-M", "RefreshProfile");

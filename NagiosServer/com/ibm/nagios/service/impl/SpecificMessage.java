@@ -19,7 +19,7 @@ import com.ibm.as400.data.ProgramCallDocument;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class SpecificMessage implements Action {
 	public SpecificMessage(){
@@ -32,10 +32,10 @@ public class SpecificMessage implements Action {
 			version = as400.getVersion();
 			release = as400.getRelease();
 		} catch (Exception eVR) {
-			response.append(StatusConstants.retrieveDataException + "| " + eVR.getMessage());
-			return StatusConstants.UNKNOWN;
+			response.append(Constants.retrieveDataException + "| " + eVR.getMessage());
+			return Constants.UNKNOWN;
 		}
-		Integer returnValue = StatusConstants.UNKNOWN;
+		Integer returnValue = Constants.UNKNOWN;
 		
 		Date date = null;
 	    Time time = null;
@@ -78,7 +78,7 @@ public class SpecificMessage implements Action {
 				JDBCConnection JDBCConn = new JDBCConnection();
 				connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 				if(connection == null) {
-					response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+					response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 					return returnValue;
 				}
 				stmt = connection.createStatement();
@@ -89,7 +89,7 @@ public class SpecificMessage implements Action {
 					rs = stmt.executeQuery("SELECT MESSAGE_ID, FROM_USER, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_ID IN (" + messageID.toUpperCase() + ")");
 				}
 				if(rs == null) {
-					response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+					response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 					return returnValue;
 				}			
 				while(rs.next()) {
@@ -101,11 +101,11 @@ public class SpecificMessage implements Action {
 					msgText = rs.getString("MESSAGE_TEXT");
 					msgSet.add(messageID);
 					count++;
-					returnValue = StatusConstants.WARN;
+					returnValue = Constants.WARN;
 					response.append("Message ID: " + messageID + " User: " + user + " Severity: " + severity + " Date: " + date + " Time: " + time + " Text: " + msgText + "\n");
 				}
 				if(count == 0) {
-					returnValue = StatusConstants.OK;
+					returnValue = Constants.OK;
 					response.append("Status: OK");
 				}
 				else {
@@ -114,7 +114,7 @@ public class SpecificMessage implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				CommonUtil.printStack(e.getStackTrace(), response);
 				e.printStackTrace();
 			}
@@ -129,7 +129,7 @@ public class SpecificMessage implements Action {
 					if(connection != null)
 						connection.close();
 				} catch (SQLException e) {
-					response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+					response.append(Constants.retrieveDataException + "| " + e.getMessage());
 					e.printStackTrace();
 				}
 			}
@@ -188,9 +188,9 @@ public class SpecificMessage implements Action {
 					// Print out all of the AS/400 messages
 				    AS400Message[] messageList = pcml.getMessageList("qgyolmsg");
 				    for (int i=0; i<messageList.length; i++) { 
-				    	response.append(StatusConstants.retrieveDataException + "| " + messageList[i].getID() + "  " + messageList[i].getText());
+				    	response.append(Constants.retrieveDataException + "| " + messageList[i].getID() + "  " + messageList[i].getText());
 					}
-					return StatusConstants.UNKNOWN;
+					return Constants.UNKNOWN;
 		        }
 				
 				// Get number messages returned    	
@@ -255,19 +255,19 @@ public class SpecificMessage implements Action {
 		            	response.append("Message ID: " + msgID + " User: " + user + " Severity: " + severity + " Time: " + dateTime + " Text: " + msgText + "\n");
 		            	msgSet.add(msgID);
 		            	count++;
-						returnValue = StatusConstants.WARN;
+						returnValue = Constants.WARN;
 		            }
 		            else if(sqlType.equalsIgnoreCase("like")) {
 		            	if(Pattern.compile(regEx).matcher(msgID).find()) {
 		            		response.append("Message ID: " + msgID + " User: " + user + " Severity: " + severity + " Time: " + dateTime + " Text: " + msgText + "\n");
 		            		msgSet.add(msgID);
 		            		count++;
-							returnValue = StatusConstants.WARN;
+							returnValue = Constants.WARN;
 		            	}
 		            }
 		        }
 		        if(count == 0) {
-					returnValue = StatusConstants.OK;
+					returnValue = Constants.OK;
 					response.append("Status: OK");
 				}
 				else {
@@ -285,7 +285,7 @@ public class SpecificMessage implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			}
 		}
 		return returnValue;

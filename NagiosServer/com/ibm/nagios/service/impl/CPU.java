@@ -10,7 +10,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class CPU implements Action {
 	public CPU(){
@@ -24,20 +24,20 @@ public class CPU implements Action {
 		String criticalCap = args.get("-C");
 		double doubleWarningCap = (warningCap == null) ? 100 : Double.parseDouble(warningCap);
 		double doubleCriticalCap = (criticalCap == null) ? 100 : Double.parseDouble(criticalCap);
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		Connection connection = null;
 		try {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT AVERAGE_CPU_UTILIZATION FROM QSYS2.SYSTEM_STATUS_INFO");
 			if(rs == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}		
 			if(rs.next()) {
@@ -49,7 +49,7 @@ public class CPU implements Action {
 			}	
 		}
 		catch(Exception e) {
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -62,7 +62,7 @@ public class CPU implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

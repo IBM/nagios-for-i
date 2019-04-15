@@ -12,7 +12,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.config.util.Base64Coder;
 import com.ibm.nagios.util.AS400Connection;
 import com.ibm.nagios.util.HostConfigInfo;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class ConnectToSystem implements Runnable {
 	Socket socket;
@@ -74,7 +74,7 @@ public class ConnectToSystem implements Runnable {
 	void PrintResponse(StringBuffer response) throws IOException {
 		OutputStream os = socket.getOutputStream();
 		PrintWriter pw = new PrintWriter(os);
-		pw.write(Integer.toString(StatusConstants.UNKNOWN) + "\r\n");
+		pw.write(Integer.toString(Constants.UNKNOWN) + "\r\n");
 		pw.write(response.toString());
 		pw.flush();
 		

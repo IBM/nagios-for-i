@@ -6,11 +6,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.ibm.nagios.util.Constants;
 import com.ibm.nagios.util.HostConfigInfo;
 
-public class Server {
-	public static final int PORT = 8888;
-	
+public class Server {	
 	public static ExecutorService workers = Executors.newCachedThreadPool();
 	
 	@SuppressWarnings("resource")
@@ -18,7 +17,7 @@ public class Server {
 		try {
 			ServerSocket serverSocket = new ServerSocket();
 			serverSocket.setReuseAddress(true);
-			serverSocket.bind(new InetSocketAddress(PORT));
+			serverSocket.bind(new InetSocketAddress(Constants.PORT));
 			if(!HostConfigInfo.load()) {
 				System.err.println("Nagios server initialized failed");
 				return;

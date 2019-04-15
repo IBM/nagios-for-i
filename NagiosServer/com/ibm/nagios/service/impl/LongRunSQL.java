@@ -11,7 +11,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class LongRunSQL implements Action {
 	DecimalFormat df = new DecimalFormat("######0.00");
@@ -30,14 +30,14 @@ public class LongRunSQL implements Action {
 		String criticalCap = args.get("-C");
 		double doubleWarningCap = (warningCap == null) ? 10 : Double.parseDouble(warningCap);	// turn to millisecond
 		double doubleCriticalCap = (criticalCap == null) ? 6 : Double.parseDouble(criticalCap);	// turn to millisecond
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		Connection connection = null;
 		try {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
@@ -46,7 +46,7 @@ public class LongRunSQL implements Action {
 					") SELECT Q_JOB_NAME, CPU_TIME, RUN_PRIORITY, V_SQL_STATEMENT_TEXT, CURRENT TIMESTAMP - V_SQL_STMT_START_TIMESTAMP AS SQL_STMT_DURATION, B.* FROM ACTIVE_USER_JOBS, TABLE(QSYS2.GET_JOB_INFO(Q_JOB_NAME)) B " +
 					"WHERE V_SQL_STMT_STATUS = 'ACTIVE' ORDER BY SQL_STMT_DURATION DESC");
 			if(rs == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
@@ -54,22 +54,22 @@ public class LongRunSQL implements Action {
 				stmtText = rs.getString("V_SQL_STATEMENT_TEXT");
 				
 				returnValue = CommonUtil.getStatus(duration, doubleWarningCap, doubleCriticalCap, returnValue);
-				if(returnValue == StatusConstants.CRITICAL) {
+				if(returnValue == Constants.CRITICAL) {
 					criticalCount++;
 					response.append("CRITICAL: Statement Duration=" + df.format(duration) + "s\n Stmt Text: " + stmtText);
 				}
-				if(returnValue == StatusConstants.WARN) {
+				if(returnValue == Constants.WARN) {
 					warnCount++;
 					response.append("WARNING: Statement Duration=" + df.format(duration) + "s\n Stmt Text: " + stmtText);
 				}
 			}
-			if (returnValue == StatusConstants.WARN) {
+			if (returnValue == Constants.WARN) {
 		        response.insert(0, "Long Run SQL Status: Warning Num: " + warnCount + " (Warning: " + doubleWarningCap + " Critical: " + doubleCriticalCap + ")\n");
 			}
-			else if (returnValue == StatusConstants.CRITICAL) {
+			else if (returnValue == Constants.CRITICAL) {
 				response.insert(0, "Long Run SQL Status: Critical Num: " + criticalCount + " (Warning: " + doubleWarningCap + " Critical: " + doubleCriticalCap + ")\n");
 			}
-			else if (returnValue == StatusConstants.OK) {
+			else if (returnValue == Constants.OK) {
 				response.insert(0, "Long Run SQL Status: OK\n");
 			}
 		}
@@ -78,7 +78,7 @@ public class LongRunSQL implements Action {
 			if(errMsg.contains("[SQL0443] NOT AUTHORIZED")) {
 				errMsg = "Service long run sql needs authority of *ALLOBJ";
 			}
-			response.append(StatusConstants.retrieveDataException + "| " + errMsg);
+			response.append(Constants.retrieveDataException + "| " + errMsg);
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class LongRunSQL implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

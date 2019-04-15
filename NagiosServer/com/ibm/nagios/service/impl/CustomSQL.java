@@ -22,7 +22,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class CustomSQL implements Action {
 	private final static String CUSTOM_SQL = "/usr/local/nagios/etc/objects/CustomSQL.xml";
@@ -43,7 +43,7 @@ public class CustomSQL implements Action {
 		String func = args.get("-F");
 		String warningCap = args.get("-W");
 		String criticalCap = args.get("-C");
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		if(func == null) {
 			response.append("The argument -F [function name] is not set");
@@ -55,14 +55,14 @@ public class CustomSQL implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			loadSQL(func);
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery(sqlCmd);
 			if(rs == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			ResultSetMetaData rsmtadta = rs.getMetaData();
@@ -115,7 +115,7 @@ public class CustomSQL implements Action {
 				}
 				else {
 					response.append("Error: Wrong SQL command format");
-					return StatusConstants.UNKNOWN;
+					return Constants.UNKNOWN;
 				}
 				while(rs.next()) {
 					String id = "";
@@ -173,7 +173,7 @@ public class CustomSQL implements Action {
 			}
 		}
 		catch(Exception e) {
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -186,7 +186,7 @@ public class CustomSQL implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

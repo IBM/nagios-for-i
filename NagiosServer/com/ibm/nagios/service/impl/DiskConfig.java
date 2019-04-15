@@ -13,7 +13,7 @@ import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.DiskXMLReader;
 import com.ibm.nagios.util.HostConfigInfo;
 import com.ibm.nagios.util.QYHCHCOP;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class DiskConfig implements Action {
 	private final static int Hardware_OK = 11;
@@ -37,7 +37,7 @@ public class DiskConfig implements Action {
 	}
 
 	public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		String system = args.get("-H");
 		String userID = HostConfigInfo.getSSTUserID(system);
 		String pass = HostConfigInfo.getSSTPassword(system);
@@ -71,7 +71,7 @@ public class DiskConfig implements Action {
 	        String resourceName = null;
 	        int status;
 	        int warningStatus = 0;
-	        returnValue = StatusConstants.OK;
+	        returnValue = Constants.OK;
 	        
 	        for(int i=0; i<disks.size(); i++) {
 	        	Disk disk = disks.get(i);
@@ -79,21 +79,21 @@ public class DiskConfig implements Action {
 	            unitNum = disk.getDiskNum();
 	            resourceName = disk.getResourceName();
 	            status = disk.getStatus();
-	            if(status!=Hardware_OK && returnValue!=StatusConstants.WARN) {
-	            	returnValue = StatusConstants.WARN;
+	            if(status!=Hardware_OK && returnValue!=Constants.WARN) {
+	            	returnValue = Constants.WARN;
 	            	warningStatus = status;
 	            }
 	            response.append("Unit " + ASPNum + "-" + unitNum + ": " + resourceName + " Status: " + STATUS[status] + "\n");
 	        }
-	        if(returnValue == StatusConstants.OK) {
+	        if(returnValue == Constants.OK) {
 	        	response.insert(0, "Disk Status: OK\n");
 	        }
-	        else if(returnValue == StatusConstants.WARN) {
+	        else if(returnValue == Constants.WARN) {
 	        	response.insert(0, "Disk Status: " + STATUS[warningStatus] + "\n");
 	        }
 		} catch (Exception e) {
 			response.setLength(0);
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

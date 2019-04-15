@@ -56,7 +56,7 @@ public class QYHCHCOP {
         
         if (!pgm.run()) {
         	AS400Message msgList[] = pgm.getMessageList(); 
-        	response.append(StatusConstants.retrieveDataError + "| ");
+        	response.append(Constants.retrieveDataError + "| ");
         	for(int i=0; i<msgList.length; i++) {
         		String msgID = msgList[i].getID();
         		String errMsg = msgList[i].getText();
@@ -77,7 +77,7 @@ public class QYHCHCOP {
             parameters_[RECEIVER_LEN].setInputData(BinaryConverter.intToByteArray(returnData));
             if (!pgm.run()) {
             	AS400Message msgList[] = pgm.getMessageList(); 
-            	response.append(StatusConstants.retrieveDataError + "| ");
+            	response.append(Constants.retrieveDataError + "| ");
             	for(int i=0; i<msgList.length; i++) {
             		response.append(msgList[i].getID() + ": " + msgList[i].getText() + "\r\n");
             	}

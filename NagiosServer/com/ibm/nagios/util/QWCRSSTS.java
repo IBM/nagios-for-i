@@ -40,7 +40,7 @@ public class QWCRSSTS {
         
         if (!pgm.run()) {
         	AS400Message msgList[] = pgm.getMessageList(); 
-        	response.append(StatusConstants.retrieveDataError + "| ");
+        	response.append(Constants.retrieveDataError + "| ");
         	for(int i=0; i<msgList.length; i++) {
         		response.append(msgList[i].getID() + ": " + msgList[i].getText() + "\r\n");
         	}

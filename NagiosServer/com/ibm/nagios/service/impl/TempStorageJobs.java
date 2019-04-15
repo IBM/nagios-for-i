@@ -10,7 +10,7 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class TempStorageJobs implements Action {
 	public TempStorageJobs(){
@@ -21,12 +21,12 @@ public class TempStorageJobs implements Action {
 			int version = as400.getVersion();
 			int release = as400.getRelease();
 			if(version < 7 || (version>=7 && release==1)) {
-				response.append(StatusConstants.retrieveDataError + "| " + "The service is not supported on this release");
-				return StatusConstants.UNKNOWN;
+				response.append(Constants.retrieveDataError + "| " + "The service is not supported on this release");
+				return Constants.UNKNOWN;
 			}
 		} catch (Exception eVR) {
-			response.append(StatusConstants.retrieveDataException + "| " + eVR.getMessage());
-			return StatusConstants.UNKNOWN;
+			response.append(Constants.retrieveDataException + "| " + eVR.getMessage());
+			return Constants.UNKNOWN;
 		}
 		String jobCount = args.get("-N");
 		int jobNum = 0;
@@ -42,21 +42,21 @@ public class TempStorageJobs implements Action {
 		String function = null;
 		Statement stmt = null;
 		ResultSet rs = null;
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		Connection connection = null;
 		try {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT SUBSTR(JOB_NAME,8,POSSTR(SUBSTR(JOB_NAME,8),'/')-1) AS JOB_USER, SUBSTR(SUBSTR(JOB_NAME,8),POSSTR(SUBSTR(JOB_NAME,8),'/')+1) AS JOB_NAME, SUBSYSTEM, ELAPSED_CPU_PERCENTAGE, FUNCTION_TYPE, FUNCTION, JOB_STATUS, TEMPORARY_STORAGE FROM TABLE (QSYS2.ACTIVE_JOB_INFO('NO', '', '', '')) X " +
 			"ORDER BY TEMPORARY_STORAGE DESC FETCH FIRST " + jobCount + " ROWS ONLY");
 			if(rs == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
@@ -82,11 +82,11 @@ public class TempStorageJobs implements Action {
 				jobNum++;
 			}
 			response.insert(0, jobNum + " jobs retrieved from endpoint. Max storage=" + maxStorage + "M\n");
-			returnValue = StatusConstants.OK;
+			returnValue = Constants.OK;
 		}
 		catch(Exception e) {
 			response.setLength(0);
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -99,7 +99,7 @@ public class TempStorageJobs implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			}
 		}
 		return returnValue;

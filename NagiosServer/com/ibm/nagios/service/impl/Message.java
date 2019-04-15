@@ -16,7 +16,7 @@ import com.ibm.as400.data.ProgramCallDocument;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class Message implements Action {
 	private static String BLANK10 = "          ";
@@ -50,8 +50,8 @@ public class Message implements Action {
 			version = as400.getVersion();
 			release = as400.getRelease();
 		} catch (Exception eVR) {
-			response.append(StatusConstants.retrieveDataException + "| " + eVR.getMessage());
-			return StatusConstants.UNKNOWN;
+			response.append(Constants.retrieveDataException + "| " + eVR.getMessage());
+			return Constants.UNKNOWN;
 		}
 		int messageNum = 0;
 		int severity = 0;
@@ -76,7 +76,7 @@ public class Message implements Action {
 			if(i!=types.length-1)
 				requireType += ",";
 		}
-		Integer returnValue = StatusConstants.UNKNOWN;
+		Integer returnValue = Constants.UNKNOWN;
 		
 		String warningCap = args.get("-W");
 		String criticalCap = args.get("-C");
@@ -90,13 +90,13 @@ public class Message implements Action {
 				JDBCConnection JDBCConn = new JDBCConnection();
 				connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 				if(connection == null) {
-					response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+					response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 					return returnValue;
 				}
 				stmt = connection.createStatement();
 				rs = stmt.executeQuery("SELECT MESSAGE_ID, FROM_USER, MESSAGE_TYPE, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_QUEUE_LIBRARY = '" + msgQueLib.trim() + "' AND MESSAGE_QUEUE_NAME = '" + msgQueName.trim() + "' AND MESSAGE_TYPE IN (" + requireType + ")");
 				if(rs == null) {
-					response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+					response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 					return returnValue;
 				}			
 				while(rs.next()) {
@@ -117,7 +117,7 @@ public class Message implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				CommonUtil.printStack(e.getStackTrace(), response);
 			}
 			finally {
@@ -132,7 +132,7 @@ public class Message implements Action {
 					if(connection != null)
 						connection.close();
 				} catch (SQLException e) {
-					response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+					response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				}
 			}
 		}
@@ -191,9 +191,9 @@ public class Message implements Action {
 					// Print out all of the AS/400 messages
 				    AS400Message[] messageList = pcml.getMessageList("qgyolmsg");
 				    for (int i=0; i<messageList.length; i++) { 
-				    	response.append(StatusConstants.retrieveDataException + "| " + messageList[i].getID() + "  " + messageList[i].getText());
+				    	response.append(Constants.retrieveDataException + "| " + messageList[i].getID() + "  " + messageList[i].getText());
 					}
-					return StatusConstants.UNKNOWN;
+					return Constants.UNKNOWN;
 		        }
 				
 				// Get number messages returned    	
@@ -276,7 +276,7 @@ public class Message implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

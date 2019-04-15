@@ -10,14 +10,14 @@ import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class SubsystemJobs implements Action {	
 	public SubsystemJobs(){
 	}
 
 	public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		String warningCap = args.get("-W");
 		String criticalCap = args.get("-C");
@@ -45,13 +45,13 @@ public class SubsystemJobs implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT SUBSTR(JOB_NAME,8,POSSTR(SUBSTR(JOB_NAME,8),'/')-1) AS JOB_USER, SUBSTR(SUBSTR(JOB_NAME,8),POSSTR(SUBSTR(JOB_NAME,8),'/')+1)  AS JOB_NAME, AUTHORIZATION_NAME, ELAPSED_CPU_PERCENTAGE, FUNCTION_TYPE, FUNCTION, JOB_STATUS, JOB_TYPE FROM TABLE (QSYS2.ACTIVE_JOB_INFO('NO', '', '', '')) AS X WHERE SUBSYSTEM = '" + subsystem.toUpperCase() + "'");
 			if(rs == null) {
-				response.append(StatusConstants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
 				return returnValue;
 			}		
 			while(rs.next()) {
@@ -72,7 +72,7 @@ public class SubsystemJobs implements Action {
 			}
 			if(jobCount == 0) {
 				response.insert(0, "subsystem " + subsystem + " is not active\n");
-				returnValue = StatusConstants.CRITICAL;
+				returnValue = Constants.CRITICAL;
 			} else {
 				response.insert(0, jobCount-1 + " jobs in subsystem " + subsystem + "\n");
 				returnValue = CommonUtil.getStatus(jobCount, intWarningCap, intCriticalCap, returnValue);
@@ -80,7 +80,7 @@ public class SubsystemJobs implements Action {
 		}
 		catch(Exception e) {
 			response.setLength(0);
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -93,7 +93,7 @@ public class SubsystemJobs implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			}
 		}
 		return returnValue;

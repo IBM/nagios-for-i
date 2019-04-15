@@ -5,13 +5,13 @@ public class CommonUtil {
 	public static int getStatus(int value, int warningCap, int CriticalCap, int curStatus) {
 		//int retVal = StatusConstants.UNKNOWN;
 		if(value >= CriticalCap) {
-			curStatus = StatusConstants.CRITICAL;
+			curStatus = Constants.CRITICAL;
 		}
-		else if(value >= warningCap && curStatus!= StatusConstants.CRITICAL) {
-			curStatus = StatusConstants.WARN;
+		else if(value >= warningCap && curStatus!= Constants.CRITICAL) {
+			curStatus = Constants.WARN;
 		}
-		else if(value < warningCap && curStatus!= StatusConstants.CRITICAL && curStatus!= StatusConstants.WARN) {
-			curStatus = StatusConstants.OK;
+		else if(value < warningCap && curStatus!= Constants.CRITICAL && curStatus!= Constants.WARN) {
+			curStatus = Constants.OK;
 		}
 		return curStatus;
 	}
@@ -19,13 +19,13 @@ public class CommonUtil {
 	public static int getStatus(double value, double warningCap, double CriticalCap, int curStatus) {
 		//int retVal = StatusConstants.UNKNOWN;
 		if(value >= CriticalCap) {
-			curStatus = StatusConstants.CRITICAL;
+			curStatus = Constants.CRITICAL;
 		}
-		else if(value >= warningCap && curStatus!= StatusConstants.CRITICAL) {
-			curStatus = StatusConstants.WARN;
+		else if(value >= warningCap && curStatus!= Constants.CRITICAL) {
+			curStatus = Constants.WARN;
 		}
-		else if(value < warningCap && curStatus!= StatusConstants.CRITICAL && curStatus!= StatusConstants.WARN) {
-			curStatus = StatusConstants.OK;
+		else if(value < warningCap && curStatus!= Constants.CRITICAL && curStatus!= Constants.WARN) {
+			curStatus = Constants.OK;
 		}
 		return curStatus;
 	}

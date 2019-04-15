@@ -7,7 +7,7 @@ import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.AS400Connection;
 import com.ibm.nagios.util.ActionFactory;
 import com.ibm.nagios.util.CommonUtil;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class RequestHandler {
 	public RequestHandler() {
@@ -23,7 +23,7 @@ public class RequestHandler {
 			String metric = args.get("-M");
 			if(metric == null) {
 				response.append("The argument -m is not set");
-				return StatusConstants.UNKNOWN;
+				return Constants.UNKNOWN;
 			}
 			String systemName = args.get("-H");
 			String user = args.get("-U");
@@ -34,7 +34,7 @@ public class RequestHandler {
 				AS400Connection.ReturnConnectionToPool(systemName+user, as400);
 			}
 		} catch(Exception e) {
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

@@ -8,7 +8,7 @@ import com.ibm.as400.access.BinaryConverter;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.QWCRSSTS;
-import com.ibm.nagios.util.StatusConstants;
+import com.ibm.nagios.util.Constants;
 
 public class CurSignOnUsers implements Action {
 	public CurSignOnUsers() {
@@ -19,7 +19,7 @@ public class CurSignOnUsers implements Action {
 		int ccsid = as400.getCcsid();
 		AS400Text text4 = new AS400Text(4, ccsid, as400);
 		byte[] data = null;
-		int returnValue = StatusConstants.UNKNOWN;
+		int returnValue = Constants.UNKNOWN;
 		
 		String warningCap = args.get("-W");
 		String criticalCap = args.get("-C");
@@ -30,7 +30,7 @@ public class CurSignOnUsers implements Action {
 		try {
 			data = pgmCall.run(as400, response);
 			if(data == null) {
-				response.append(StatusConstants.retrieveDataError);
+				response.append(Constants.retrieveDataError);
 				return returnValue;
 			}
 			int signOnUserNum = BinaryConverter.byteArrayToInt(text4.toBytes(text4.toObject(data, 24)), 0);
@@ -38,7 +38,7 @@ public class CurSignOnUsers implements Action {
 			returnValue = CommonUtil.getStatus(signOnUserNum, intWarningCap, intCriticalCap, returnValue);
 			response.insert(0, "Currently Sign On Users Num: " + signOnUserNum + " | 'Currently Sign On Users Num' = " + signOnUserNum + ";" + warningCap + ";" + criticalCap);
 		} catch (Exception e) {
-			response.append(StatusConstants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

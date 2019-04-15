@@ -7,25 +7,18 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
+import com.ibm.nagios.util.Constants;
+
 public class CheckDaemonStatus {
-	private static final int PORT = 8888;
-	private static final String SERVER = "localhost";
-	
 	private static HashMap<String, String> argsMap = new HashMap<String, String>();
 	
-	public static String retrieveDataException = "Exception";
-	public static String retrieveDataError = "Error";
-	public static int OK = 0;
-	public static int WARN = 1;
-	public static int CRITICAL = 2;
-	public static int UNKNOWN = 3;
 	static Socket socket = null;
     
 	public static void main(String args[]) {
-		int retValue = UNKNOWN;
+		int retValue = Constants.UNKNOWN;
 		try {
 			ParseArgs(args);
-			socket = new Socket(SERVER, PORT);
+			socket = new Socket(Constants.SERVER, Constants.PORT);
 			socket.setReuseAddress(true);
 			socket.setSoLinger(true, 0);
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
