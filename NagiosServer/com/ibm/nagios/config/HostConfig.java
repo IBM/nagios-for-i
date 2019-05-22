@@ -28,38 +28,50 @@ public class HostConfig {
 	
 	public static void main(String args[]) {
 		if(args.length == 0) {
-			System.out.println("Input parameters error");
+			System.out.println(args.length + " parameters is invalid. Input parameters error");
 			return;
 		}
 		String action = args[0];
 		Console console = System.console();
 		String type = null;
 		if(action.equalsIgnoreCase("-i")) {
-			if(args.length != 2) {
-				System.out.println("Input parameter error");
+			if(args.length!=2 && args.length!=5) {
+				System.out.println(args.length + " parameters is invalid. Input parameter error");
 				return;
 			}
 			type = args[1];
 			if(type!=null && (type.equalsIgnoreCase("host") || type.equalsIgnoreCase("sst"))) {
-				String hostAddr = console.readLine("Input the host address(IP):").trim();
-				String user = console.readLine("Input the userID:").trim();
-				char[] password1 = console.readPassword("Input the password:");
-				char[] password2 = console.readPassword("Confirm the password:");
-				String pass1 = new String(password1);
-				pass1= pass1.trim();
-				String pass2 = new String(password2);
-				pass2= pass2.trim();
-				if(!pass1.equals(pass2)) {
-					System.out.println("The two passwords do not match");
-					return;
-				}
-
-				if(Insert(hostAddr, user, pass1.trim(), type.trim())) {
-					System.out.println("Insert the item successfully");
-					System.out.println("Host: " + hostAddr + "    User: " + user);
-				}
-				else {
-					System.out.println("Insert host failed");
+				if(args.length == 5) { //called from wizard
+					if(args[2]!=null && args[3]!=null && args[4]!=null) {
+						if(Insert(args[2].trim(), args[3].trim(), args[4].trim(), type.trim())) {
+							System.out.println("Insert the item successfully");
+							System.out.println("Host: " + args[2] + "    User: " + args[3]);
+						}
+						else {
+							System.out.println("Insert host failed");
+						}
+					}
+				} else if(args.length == 2) { //called from terminal
+					String hostAddr = console.readLine("Input the host address(IP):").trim();
+					String user = console.readLine("Input the userID:").trim();
+					char[] password1 = console.readPassword("Input the password:");
+					char[] password2 = console.readPassword("Confirm the password:");
+					String pass1 = new String(password1);
+					pass1= pass1.trim();
+					String pass2 = new String(password2);
+					pass2= pass2.trim();
+					if(!pass1.equals(pass2)) {
+						System.out.println("The two passwords do not match");
+						return;
+					}
+	
+					if(Insert(hostAddr, user, pass1.trim(), type.trim())) {
+						System.out.println("Insert the item successfully");
+						System.out.println("Host: " + hostAddr + "    User: " + user);
+					}
+					else {
+						System.out.println("Insert host failed");
+					}
 				}
 			}
 			else {

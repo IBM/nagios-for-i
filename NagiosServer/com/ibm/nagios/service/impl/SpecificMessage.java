@@ -114,7 +114,7 @@ public class SpecificMessage implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
 				CommonUtil.printStack(e.getStackTrace(), response);
 				e.printStackTrace();
 			}

@@ -67,7 +67,7 @@ public class PageFaults implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
 				e.printStackTrace();
 			}
 		}

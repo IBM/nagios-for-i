@@ -49,7 +49,7 @@ public class ActiveJobs implements Action {
 			response.insert(0, "Num of Active Jobs: " + actJobNum + " | 'Num of Active Jobs' = " + actJobNum + ";" + warningCap + ";" + criticalCap);
 		}
 		catch(Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

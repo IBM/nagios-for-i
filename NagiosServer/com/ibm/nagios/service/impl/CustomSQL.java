@@ -83,7 +83,7 @@ public class CustomSQL implements Action {
 							int value = rs.getInt(colName);
 							
 							returnValue = CommonUtil.getStatus(value, intWarningCap, intCriticalCap, returnValue);
-							response.append(commonName + ": " + value + " (Warning: " + warningCap + "% Critical: " + criticalCap + ") | '" + commonName + "' = " + value + ";" + intWarningCap + ";" + intCriticalCap);
+							response.append(commonName + ": " + value + " | '" + commonName + "' = " + value + ";" + intWarningCap + ";" + intCriticalCap);
 						}
 						else if(colType.equalsIgnoreCase("DECIMAL")) {
 							double doubleWarningCap = (warningCap == null) ? 100 : Double.parseDouble(warningCap);
@@ -173,7 +173,7 @@ public class CustomSQL implements Action {
 			}
 		}
 		catch(Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null?e.toString():e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -186,7 +186,7 @@ public class CustomSQL implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
 				e.printStackTrace();
 			}
 		}

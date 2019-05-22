@@ -65,7 +65,7 @@ public class CPUOverloadJobs implements Action {
 			return returnValue;
 		}
 		catch(Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage());
+			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

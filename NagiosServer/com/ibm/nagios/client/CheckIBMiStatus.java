@@ -99,7 +99,10 @@ public class CheckIBMiStatus {
 			}
 			else {
 				value += argv[i];
-				argsMap.put(key, value);
+				if(key.equalsIgnoreCase("-a")) {
+					ParseArgs(value.split(" "));
+				} else
+					argsMap.put(key, value);
 			}
 		}
 	}
