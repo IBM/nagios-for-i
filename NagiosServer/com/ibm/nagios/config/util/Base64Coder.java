@@ -1,33 +1,4 @@
 package com.ibm.nagios.config.util;
-////////////////////////////////////////////////////////////////////////
-//IBM Confidential
-//
-//OCO Source Materials
-//
-//The Source code for this program is not published or otherwise
-//divested of its trade secrets, irrespective of what has been
-//deposited with the U.S. Copyright Office
-//
-//5761-XE1
-//(C) Copyright IBM Corp. 2008.
-////////////////////////////////////////////////////////////////////////
-//File Name:    Base64Coder.java
-//
-//Classes:      Base64Coder
-//
-//Description:  This class is used to encode and decode data in Base64 
-//              format as described in RFC 1521.
-//
-////////////////////////////////////////////////////////////////////////
-//CHANGE ACTIVITY:
-//
-// Flg Reason     Release   Date       Userid      Comments
-// $A0=P9C20859   v6r1m0f   02/18/08   TLK   :     Created
-//
-//END CHANGE ACTIVITY
-////////////////////////////////////////////////////////////////////////
-
-
 
 public class Base64Coder 
 {
