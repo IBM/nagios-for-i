@@ -44,7 +44,7 @@ public class HostConfigInfo {
                 	if(elem.length != 4) {
                 		System.err.println("HostConfig-load(): bad format of profile.csv");
                 		bufferedReader.close();
-                		return false;
+                		return true;//DO NOT let the loading failure stop the server initialization
                 	}
                 	system = elem[0];
                 	user = elem[1];
