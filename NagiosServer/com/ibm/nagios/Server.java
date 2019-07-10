@@ -29,7 +29,7 @@ public class Server {
 				workers.execute(new ConnectToSystem(socket)); //start thread to get as400 connection
 			}		
         } catch (Exception e) {
-        	System.err.println("Server - main(): " + e.getMessage());
+        	System.err.println("Server - main(): " + e.toString());
         	e.printStackTrace();
         }
 	}

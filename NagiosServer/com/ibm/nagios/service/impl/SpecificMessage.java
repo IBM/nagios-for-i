@@ -32,7 +32,7 @@ public class SpecificMessage implements Action {
 			version = as400.getVersion();
 			release = as400.getRelease();
 		} catch (Exception eVR) {
-			response.append(Constants.retrieveDataException + "| " + eVR.getMessage());
+			response.append(Constants.retrieveDataException + " - " + eVR.getMessage());
 			return Constants.UNKNOWN;
 		}
 		Integer returnValue = Constants.UNKNOWN;
@@ -78,7 +78,7 @@ public class SpecificMessage implements Action {
 				JDBCConnection JDBCConn = new JDBCConnection();
 				connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 				if(connection == null) {
-					response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+					response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 					return returnValue;
 				}
 				stmt = connection.createStatement();
@@ -89,7 +89,7 @@ public class SpecificMessage implements Action {
 					rs = stmt.executeQuery("SELECT MESSAGE_ID, FROM_USER, MESSAGE_TEXT, SEVERITY, MESSAGE_TIMESTAMP FROM QSYS2.MESSAGE_QUEUE_INFO WHERE MESSAGE_ID IN (" + messageID.toUpperCase() + ")");
 				}
 				if(rs == null) {
-					response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
+					response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 					return returnValue;
 				}			
 				while(rs.next()) {
@@ -114,7 +114,7 @@ public class SpecificMessage implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 				CommonUtil.printStack(e.getStackTrace(), response);
 				e.printStackTrace();
 			}
@@ -129,7 +129,7 @@ public class SpecificMessage implements Action {
 					if(connection != null)
 						connection.close();
 				} catch (SQLException e) {
-					response.append(Constants.retrieveDataException + "| " + e.getMessage());
+					response.append(Constants.retrieveDataException + " - " + e.toString());
 					e.printStackTrace();
 				}
 			}
@@ -188,7 +188,7 @@ public class SpecificMessage implements Action {
 					// Print out all of the AS/400 messages
 				    AS400Message[] messageList = pcml.getMessageList("qgyolmsg");
 				    for (int i=0; i<messageList.length; i++) { 
-				    	response.append(Constants.retrieveDataException + "| " + messageList[i].getID() + "  " + messageList[i].getText());
+				    	response.append(Constants.retrieveDataException + " - " + messageList[i].getID() + "  " + messageList[i].getText());
 					}
 					return Constants.UNKNOWN;
 		        }
@@ -285,7 +285,7 @@ public class SpecificMessage implements Action {
 			}
 			catch(Exception e) {
 				response.setLength(0);
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 			}
 		}
 		return returnValue;

@@ -47,7 +47,7 @@ public class Initialization {
 			}
 		} catch (Exception e) {
 			System.err.println("Initialize failed");
-			System.out.println("ERROR: " + e.getMessage());
+			System.out.println("ERROR: " + e.toString());
 		}
 	}
 

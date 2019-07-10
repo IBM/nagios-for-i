@@ -41,13 +41,13 @@ public class DiskUsage implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT ASP_NUMBER, UNIT_NUMBER, UNIT_TYPE, UNIT_STORAGE_CAPACITY, UNIT_SPACE_AVAILABLE, PERCENT_USED FROM QSYS2.SYSDISKSTAT");
 			if(rs == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
@@ -67,7 +67,7 @@ public class DiskUsage implements Action {
 		}
 		catch(Exception e) {
 			response.setLength(0);
-			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -81,7 +81,7 @@ public class DiskUsage implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 				e.printStackTrace();
 			}
 		}

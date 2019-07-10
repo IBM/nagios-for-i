@@ -55,16 +55,18 @@ public class QYHCHCOP {
     	init(system);
         
         if (!pgm.run()) {
-        	AS400Message msgList[] = pgm.getMessageList(); 
-        	response.append(Constants.retrieveDataError + "| ");
+        	AS400Message msgList[] = pgm.getMessageList();
+        	StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+        	response.append(Constants.retrieveDataError + " - ");
         	for(int i=0; i<msgList.length; i++) {
         		String msgID = msgList[i].getID();
         		String errMsg = msgList[i].getText();
         		if(msgID.equalsIgnoreCase("MCH1001") && errMsg.equalsIgnoreCase("Attempt to use permanent system object QYHCHCOP without authority.")) {
         			errMsg = "Service Disk configuration needs authorities of *ALLOBJ, *SERVICE and *IOSYSCFG";
         		}
-        		response.append(msgList[i].getID() + ": " + errMsg + "\n");
+        		response.append(msgID + ": " + errMsg + "\n");
         	}
+        	CommonUtil.printStack(stackTrace, response);
             return null;
         }
         String receiver = new String(parameters_[3].getOutputData(), EBCDIC_CODE_PAGE);
@@ -76,11 +78,13 @@ public class QYHCHCOP {
         	parameters_[RECEIVER].setOutputDataLength(returnData);
             parameters_[RECEIVER_LEN].setInputData(BinaryConverter.intToByteArray(returnData));
             if (!pgm.run()) {
-            	AS400Message msgList[] = pgm.getMessageList(); 
-            	response.append(Constants.retrieveDataError + "| ");
+            	AS400Message msgList[] = pgm.getMessageList();
+            	StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+            	response.append(Constants.retrieveDataError + " - " + stackTrace[0].toString());
             	for(int i=0; i<msgList.length; i++) {
-            		response.append(msgList[i].getID() + ": " + msgList[i].getText() + "\r\n");
+            		response.append(msgList[i].getID() + ": " + msgList[i].getText() + "\n");
             	}
+            	CommonUtil.printStack(stackTrace, response);
                 return null;
             }
             else {

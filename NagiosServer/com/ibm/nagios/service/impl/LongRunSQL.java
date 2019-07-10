@@ -37,7 +37,7 @@ public class LongRunSQL implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
@@ -46,7 +46,7 @@ public class LongRunSQL implements Action {
 					") SELECT Q_JOB_NAME, CPU_TIME, RUN_PRIORITY, V_SQL_STATEMENT_TEXT, CURRENT TIMESTAMP - V_SQL_STMT_START_TIMESTAMP AS SQL_STMT_DURATION, B.* FROM ACTIVE_USER_JOBS, TABLE(QSYS2.GET_JOB_INFO(Q_JOB_NAME)) B " +
 					"WHERE V_SQL_STMT_STATUS = 'ACTIVE' ORDER BY SQL_STMT_DURATION DESC");
 			if(rs == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
@@ -78,7 +78,7 @@ public class LongRunSQL implements Action {
 			if(errMsg.contains("[SQL0443] NOT AUTHORIZED")) {
 				errMsg = "Service long run sql needs authority of *ALLOBJ";
 			}
-			response.append(Constants.retrieveDataException + "| " + errMsg);
+			response.append(Constants.retrieveDataException + " - " + errMsg==null ? e.toString() : errMsg);
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class LongRunSQL implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 				e.printStackTrace();
 			}
 		}

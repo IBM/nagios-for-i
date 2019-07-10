@@ -11,6 +11,7 @@ import java.util.HashMap;
 import com.ibm.as400.access.AS400;
 import com.ibm.nagios.config.util.Base64Coder;
 import com.ibm.nagios.util.AS400Connection;
+import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.HostConfigInfo;
 import com.ibm.nagios.util.Constants;
 
@@ -24,6 +25,7 @@ public class ConnectToSystem implements Runnable {
 	@SuppressWarnings("unchecked")
 	public void run() {
 		StringBuffer response = new StringBuffer();
+		int retval = Constants.UNKNOWN;
 		try {
 			InputStream is = socket.getInputStream();
 			ObjectInputStream ois = new ObjectInputStream(is);
@@ -32,8 +34,8 @@ public class ConnectToSystem implements Runnable {
 			if(systemName == null) {
 				String metric = args.get("-M");
 				if(metric.equalsIgnoreCase("DaemonServer")) {	//check daemon server status
-					CheckIBMiStatus check = new CheckIBMiStatus(null, socket, args);
-					check.run();
+					CheckIBMiStatus check = new CheckIBMiStatus(null, args);
+					check.run(response);
 				} else if(metric.equalsIgnoreCase("RefreshProfile")) {//reload HostConfigInfo
 					HostConfigInfo.load();
 				}
@@ -44,7 +46,6 @@ public class ConnectToSystem implements Runnable {
 				String pass = HostConfigInfo.getPassword(systemName);
 				if(user==null || pass==null) {
 					response.append("Host user profile not set");
-					PrintResponse(response);
 					return;
 				}
 				String password = Base64Coder.decodeString(pass);
@@ -54,27 +55,38 @@ public class ConnectToSystem implements Runnable {
 				AS400 as400 = as400Conn.getAS400Object(systemName, user, password, response, args.get("-SSL"));
 				if(as400 == null) {
 					response.append("\nConnectToSystem - run(): as400 is null");
-					PrintResponse(response);
 				}
 				else {
 					as400.setGuiAvailable(false);
 //					Server.metricPool.execute(new CheckIBMiStatus(as400, socket, args));
-					CheckIBMiStatus check = new CheckIBMiStatus(as400, socket, args);
-					check.run();
+					CheckIBMiStatus check = new CheckIBMiStatus(as400, args);
+					retval = check.run(response);
 				}
 			}
 		} catch (Exception e) {
-			System.err.println("ConnectToSystem - run(): " + e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
+			CommonUtil.printStack(e.getStackTrace(), response);
+			System.err.println("ConnectToSystem - run(): " + e.toString());
 			e.printStackTrace();
 		} finally {
+			try {
+				PrintResponse(retval, response);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			response = null;
 		}
 	}
 	
-	void PrintResponse(StringBuffer response) throws IOException {
+	void PrintResponse(Integer retVal, StringBuffer response) throws IOException {
 		OutputStream os = socket.getOutputStream();
 		PrintWriter pw = new PrintWriter(os);
-		pw.write(Integer.toString(Constants.UNKNOWN) + "\r\n");
+		if(retVal != null) {
+			pw.write(retVal + "\n");
+		} else {
+			pw.write(Integer.toString(Constants.UNKNOWN) + "\n");
+		}
 		pw.write(response.toString());
 		pw.flush();
 		

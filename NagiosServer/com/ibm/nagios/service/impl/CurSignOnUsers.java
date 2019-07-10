@@ -38,7 +38,7 @@ public class CurSignOnUsers implements Action {
 			returnValue = CommonUtil.getStatus(signOnUserNum, intWarningCap, intCriticalCap, returnValue);
 			response.insert(0, "Currently Sign On Users Num: " + signOnUserNum + " | 'Currently Sign On Users Num' = " + signOnUserNum + ";" + warningCap + ";" + criticalCap);
 		} catch (Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}

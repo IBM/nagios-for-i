@@ -55,7 +55,7 @@ command_name	check-ibmi-temp-storage-jobs
 command_line	/bin/bash $USER1$/check_ibmi_status.sh -M TempStorageJobs -H $HOSTADDRESS$ -N $ARG1$(Number of jobs want to retrieve)
 
 command_name	check-ibmi-long-run-sql
-command_line	/bin/bash $USER1$/check_ibmi_status.sh -M LogRunSQL -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
+command_line	/bin/bash $USER1$/check_ibmi_status.sh -M LongRunSQL -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
 
 command_name	check-ibmi-cur-logon-users
 command_line	/bin/bash $USER1$/check_ibmi_status.sh -M CurSignOnUsers -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$
@@ -84,6 +84,7 @@ GROUP PTF
 V7R1: SF99701 LEVEL 38
 V7R2: SF99702 LEVEL 16
 V7R3: SF99703 LEVEL 4
+V7R4: BASE
 
 USER PROFILE
 check-ibmi-long-run-sql needs *ALLOBJ

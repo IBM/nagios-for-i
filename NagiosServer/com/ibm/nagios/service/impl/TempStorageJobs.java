@@ -21,11 +21,11 @@ public class TempStorageJobs implements Action {
 			int version = as400.getVersion();
 			int release = as400.getRelease();
 			if(version < 7 || (version>=7 && release==1)) {
-				response.append(Constants.retrieveDataError + "| " + "The service is not supported on this release");
+				response.append(Constants.retrieveDataError + " - " + "The service is not supported on this release");
 				return Constants.UNKNOWN;
 			}
 		} catch (Exception eVR) {
-			response.append(Constants.retrieveDataException + "| " + eVR.getMessage());
+			response.append(Constants.retrieveDataException + " - " + eVR.getMessage());
 			return Constants.UNKNOWN;
 		}
 		String jobCount = args.get("-N");
@@ -49,14 +49,14 @@ public class TempStorageJobs implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT SUBSTR(JOB_NAME,8,POSSTR(SUBSTR(JOB_NAME,8),'/')-1) AS JOB_USER, SUBSTR(SUBSTR(JOB_NAME,8),POSSTR(SUBSTR(JOB_NAME,8),'/')+1) AS JOB_NAME, SUBSYSTEM, ELAPSED_CPU_PERCENTAGE, FUNCTION_TYPE, FUNCTION, JOB_STATUS, TEMPORARY_STORAGE FROM TABLE (QSYS2.ACTIVE_JOB_INFO('NO', '', '', '')) X " +
 			"ORDER BY TEMPORARY_STORAGE DESC FETCH FIRST " + jobCount + " ROWS ONLY");
 			if(rs == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 				return returnValue;
 			}
 			while(rs.next()) {
@@ -86,7 +86,7 @@ public class TempStorageJobs implements Action {
 		}
 		catch(Exception e) {
 			response.setLength(0);
-			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -99,7 +99,7 @@ public class TempStorageJobs implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 			}
 		}
 		return returnValue;

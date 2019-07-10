@@ -37,25 +37,27 @@ public class SpecificJobCPU implements Action {
 			JDBCConnection JDBCConn = new JDBCConnection();
 			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
 			if(connection == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot get the JDBC connection");
+				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT ELAPSED_CPU_PERCENTAGE FROM TABLE(QSYS2.ACTIVE_JOB_INFO('NO', '', '"+ jobName + "', '')) X");
 			if(rs == null) {
-				response.append(Constants.retrieveDataError + "| " + "Cannot retrieve data from server");
+				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 				return returnValue;
-			}		
+			}
+			response.append(jobName + " is not active");
 			if(rs.next()) {
 				CPUPercentage = rs.getDouble("ELAPSED_CPU_PERCENTAGE");
 				
 				returnValue = CommonUtil.getStatus(CPUPercentage, doubleWarningCap, doubleCriticalCap, returnValue);
+				response.setLength(0);
 				response.append("Job: " + jobName + " CPU: " + CPUPercentage + "% " + " | CPU = " + CPUPercentage + "%;" + doubleWarningCap + ";" + doubleCriticalCap);
 				return returnValue;
-			}	
+			}
 		}
 		catch(Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			e.printStackTrace();
 		}
@@ -68,7 +70,7 @@ public class SpecificJobCPU implements Action {
 				if(connection != null)
 					connection.close();
 			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + "| " + e.getMessage());
+				response.append(Constants.retrieveDataException + " - " + e.toString());
 				e.printStackTrace();
 			}
 		}

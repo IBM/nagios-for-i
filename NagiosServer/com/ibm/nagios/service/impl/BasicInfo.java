@@ -34,7 +34,7 @@ public class BasicInfo implements Action {
 				response.append("Password will be expired in " + expireDays + " days");
 			}
 		} catch (Exception e) {
-			response.append(Constants.retrieveDataException + "| " + e.getMessage()==null ? e.toString() : e.getMessage());
+			response.append(Constants.retrieveDataException + " - " + e.toString());
 			CommonUtil.printStack(e.getStackTrace(), response);
 			returnValue = Constants.UNKNOWN;
 			e.printStackTrace();

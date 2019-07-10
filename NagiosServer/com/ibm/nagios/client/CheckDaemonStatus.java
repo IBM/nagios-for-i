@@ -36,7 +36,7 @@ public class CheckDaemonStatus {
 				retValue = Integer.parseInt(result);
 			}
 		} catch (IOException e) {
-			System.out.println("Daemon server went wrong | Please restart the server");
+			System.out.println("Daemon server went wrong\nPlease restart the server");
 		}
 		finally {
 			try {

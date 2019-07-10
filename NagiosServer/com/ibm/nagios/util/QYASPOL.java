@@ -114,9 +114,9 @@ public class QYASPOL {
             }
             return receiverLength;
         } catch (Exception e) {
-            System.err.println("QYASPOL300.collectData: " + e.getMessage());
+            System.err.println("QYASPOL300.collectData: " + e.toString());
             e.printStackTrace();
-            throw new Exception("QYASPOL300.getPCLength: " + e.getMessage());
+            throw new Exception("QYASPOL300.getPCLength: " + e.toString());
         } finally {
         	text8 = null;
         	text4 = null;
