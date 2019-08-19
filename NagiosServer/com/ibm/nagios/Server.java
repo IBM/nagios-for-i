@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.ibm.nagios.util.Constants;
+import com.ibm.nagios.util.CustomPluginFactory;
 import com.ibm.nagios.util.HostConfigInfo;
 
 public class Server {	
@@ -22,6 +23,7 @@ public class Server {
 				System.err.println("Nagios server initialized failed");
 				return;
 			}
+			CustomPluginFactory.load();
 			System.out.println("Nagios server initialized successfully");
 			System.setProperty("com.ibm.as400.access.AS400.guiAvailable", "false");
 			while(true) {

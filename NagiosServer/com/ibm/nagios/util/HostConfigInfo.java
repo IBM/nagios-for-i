@@ -14,7 +14,7 @@ import com.ibm.nagios.config.util.UserInfo;
  * load the info of file Nagios.host.java.config.ser
  */
 public class HostConfigInfo {
-	private final static String CUST_PROFILE = "/usr/local/nagios/profile.csv";
+	private final static String CUST_PROFILE = "/usr/local/nagios/var/profile.csv";
 	private static HashMap<String, UserInfo> hosts = null;
 	private static HashMap<String, UserInfo> sst = null;
 

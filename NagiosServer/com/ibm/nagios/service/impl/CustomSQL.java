@@ -1,7 +1,5 @@
 package com.ibm.nagios.service.impl;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -10,26 +8,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.ibm.as400.access.AS400;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
 import com.ibm.nagios.util.Constants;
+import com.ibm.nagios.util.CustomBean;
+import com.ibm.nagios.util.CustomPluginFactory;
 
 public class CustomSQL implements Action {
-	private final static String CUSTOM_SQL = "/usr/local/nagios/etc/objects/CustomSQL.xml";
-	//private final static String CUSTOM_SQL = "C:/Users/IBM_ADMIN/Desktop/Nagios/etc/objects/CustomSQL.xml";
-	private static String commonName = null;
-	private static String type = null;
-	private static String sqlCmd = null;
 	public CustomSQL(){
 	}
 
@@ -58,9 +45,13 @@ public class CustomSQL implements Action {
 				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
-			loadSQL(func);
+			CustomBean custBean = CustomPluginFactory.get(func.toLowerCase());
+			if(custBean == null) {
+				response.append(Constants.retrieveDataError + " - " + "function define not found: " + func);
+				return returnValue;
+			}
 			stmt = connection.createStatement();
-			rs = stmt.executeQuery(sqlCmd);
+			rs = stmt.executeQuery(custBean.sqlCmd);
 			if(rs == null) {
 				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
 				return returnValue;
@@ -72,7 +63,7 @@ public class CustomSQL implements Action {
 				 String colType = rsmtadta.getColumnTypeName(i);
 				 columns.add(new String[]{colName, colType});
 			}
-			if(type.equalsIgnoreCase("single-value")) {
+			if(custBean.type.equalsIgnoreCase("single-value")) {
 				if(rs.next()) {
 					if(columns.size() == 1) {
 						String colName = columns.get(0)[0];
@@ -83,7 +74,7 @@ public class CustomSQL implements Action {
 							int value = rs.getInt(colName);
 							
 							returnValue = CommonUtil.getStatus(value, intWarningCap, intCriticalCap, returnValue);
-							response.append(commonName + ": " + value + " | '" + commonName + "' = " + value + ";" + intWarningCap + ";" + intCriticalCap);
+							response.append(custBean.commonName + ": " + value + " | '" + custBean.commonName + "' = " + value + ";" + intWarningCap + ";" + intCriticalCap);
 						}
 						else if(colType.equalsIgnoreCase("DECIMAL")) {
 							double doubleWarningCap = (warningCap == null) ? 100 : Double.parseDouble(warningCap);
@@ -91,7 +82,7 @@ public class CustomSQL implements Action {
 							double value = rs.getDouble(colName);
 							
 							returnValue = CommonUtil.getStatus(value, doubleWarningCap, doubleCriticalCap, returnValue);
-							response.append(commonName + ": " + value + " | '" + commonName + "' = " + value + ";" + doubleWarningCap + ";" + doubleCriticalCap);
+							response.append(custBean.commonName + ": " + value + " | '" + custBean.commonName + "' = " + value + ";" + doubleWarningCap + ";" + doubleCriticalCap);
 						}
 					}
 					else {
@@ -99,7 +90,7 @@ public class CustomSQL implements Action {
 					}
 				}
 			}
-			else if(type.equalsIgnoreCase("muti-value") || type.equalsIgnoreCase("multi-value")) {
+			else if(custBean.type.equalsIgnoreCase("muti-value") || custBean.type.equalsIgnoreCase("multi-value")) {
 				String idName = null;
 				String colName = null;
 				String colType = null;
@@ -153,9 +144,9 @@ public class CustomSQL implements Action {
 						response.append("'" + id + "' = " + value + ";" + doubleWarningCap + ";" + doubleCriticalCap);
 					}
 				}
-				response.insert(0, commonName + ": " + outputValue + " | ");
+				response.insert(0, custBean.commonName + ": " + outputValue + " | ");
 			}
-			else if(type.equalsIgnoreCase("list")) {
+			else if(custBean.type.equalsIgnoreCase("list")) {
 				double intWarningCap = (warningCap == null) ? 1 : Double.parseDouble(warningCap);
 				double intCriticalCap = (criticalCap == null) ? 1 : Double.parseDouble(criticalCap);
 				while(rs.next()) {
@@ -169,7 +160,7 @@ public class CustomSQL implements Action {
 				}
 				
 				returnValue = CommonUtil.getStatus(count, intWarningCap, intCriticalCap, returnValue);
-				response.insert(0, commonName + " count of record: " + count + "\n");
+				response.insert(0, custBean.commonName + " count of record: " + count + "\n");
 			}
 		}
 		catch(Exception e) {
@@ -191,44 +182,5 @@ public class CustomSQL implements Action {
 			}
 		}
 		return returnValue;
-	}
-	
-	private void loadSQL(String funcID) throws Exception {
-		InputStream is = new FileInputStream(CUSTOM_SQL);
-		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document document = db.parse(is);
-		Element root = document.getDocumentElement();
-		NodeList list = root.getElementsByTagName("func");
-		boolean findFlag = false;
-		Node node = null;
-		Node child = null;
-		String function = null;
-		
-		for(int i=0; i<list.getLength(); i++) {
-			node = list.item(i);
-			function = node.getAttributes().getNamedItem("id").getNodeValue().toLowerCase();
-			if(function.equalsIgnoreCase(funcID)) {
-				findFlag = true;
-				break;
-			}
-		}
-		if(!findFlag) {
-			throw new Exception("cannot find the function " + funcID + " in " + CUSTOM_SQL);
-		}
-		NodeList childList = node.getChildNodes();
-		for(int i=0; i<childList.getLength(); i++) {
-			child = childList.item(i);
-			if(child.getNodeType()!=Node.ELEMENT_NODE)
-				continue;
-			if(child.getNodeName().equalsIgnoreCase("common-name")) {
-				commonName = child.getTextContent();
-			}
-			if(child.getNodeName().equalsIgnoreCase("type")) {
-				type = child.getTextContent();
-			}
-			if(child.getNodeName().equalsIgnoreCase("sql-command")) {
-				sqlCmd = child.getTextContent();
-			}
-		}
 	}
 }
