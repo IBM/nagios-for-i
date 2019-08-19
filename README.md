@@ -1,5 +1,5 @@
 # nagios-for-i
-
+## Overview
 Nagios provides enterprise-class Open Source IT monitoring, network monitoring, server and applications monitoring.<br>
 We provide several customized plugin for monitoring IBM i systems.<br>
 You could refer to the [wiki](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/IBM%20i%20Technology%20Updates/page/Nagios%20plugin%20support%20for%20IBM%20i ) for more details.
@@ -29,3 +29,9 @@ The plugins suport to mornitor following martix<br>
   TempStorageJobs   Retrieve top N jobs that have the most temp storage usage<br>
   DaemonServer      Retrieve the daemon server status<br>
 </pre>
+
+## NaigosXI Wizards
+* ibmicommand.zip <br>
+The wizard ibmicommand.zip is mainly used to manage CustomSQL.xml. And also you can preview all the pre-defined commands.
+* ibmiservice.zip <br>
+You can create the services by wizard ibmiservice.zip. Fill in the IP address and user profile information, and check the command you want to process. Then the services will be generate automatically.
