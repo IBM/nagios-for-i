@@ -47,7 +47,7 @@ public class CustomSQL implements Action {
 			}
 			CustomBean custBean = CustomPluginFactory.get(func.toLowerCase());
 			if(custBean == null) {
-				response.append(Constants.retrieveDataError + " - " + "function define not found: " + func);
+				response.append(Constants.retrieveDataError + " - " + "function definition not found: " + func);
 				return returnValue;
 			}
 			stmt = connection.createStatement();

@@ -5,6 +5,6 @@ public class Version {
 	
 	public static void main(String[] argv) {
 		System.out.println("Nagios plugin for i version: " + VERSION);
-		System.out.println("Released on 08/19/2019");
+		System.out.println("Released on 09/06/2019");
 	}
 }

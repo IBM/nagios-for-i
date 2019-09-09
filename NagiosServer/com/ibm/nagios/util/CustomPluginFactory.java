@@ -55,7 +55,12 @@ public class CustomPluginFactory {
 		}
 	}
 	
-	public static CustomBean get(String funcId) {
-		return custHandler.get(funcId);
+	public static CustomBean get(String funcId) throws Exception {
+		CustomBean custBean = custHandler.get(funcId);
+		if(custBean == null) {
+			load();
+			custBean = custHandler.get(funcId);
+		}
+		return custBean;
 	}
 }

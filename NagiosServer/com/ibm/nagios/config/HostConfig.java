@@ -139,6 +139,9 @@ public class HostConfig {
         catch (Exception e) {
         	e.printStackTrace();
         	System.out.println(e.toString());
+        	for(StackTraceElement ele : e.getStackTrace()) {
+        		System.out.println(ele);
+        	}
         }
 		return false;
 	}
