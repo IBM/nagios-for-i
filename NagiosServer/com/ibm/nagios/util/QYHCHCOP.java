@@ -49,20 +49,6 @@ public class QYHCHCOP {
     public QYHCHCOP() {
 
     }
-
-    public static void main(String[] args) {
-    	AS400 as400 = new AS400("ut25bp20.rch.stglabs.ibm.com", "zhangyan", "zhywelc0me");
-    	StringBuffer response = new StringBuffer();
-    	QYHCHCOP pgm = new QYHCHCOP();
-    	
-    	try {
-			pgm.run(as400, response);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	System.out.println(response);
-    }
     
     public final String run(AS400 system, StringBuffer response) throws Exception {
     	final ProgramCall pgm = new ProgramCall(system, programName_, parameters_);

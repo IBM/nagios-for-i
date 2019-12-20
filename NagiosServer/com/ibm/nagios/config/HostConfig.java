@@ -26,8 +26,9 @@ public class HostConfig {
 	private final static String NEW_DIRECTORY = "/usr/local/nagios/var/";//change the directory for XI permission problem
 	private final static String FILENAME = "Nagios.host.java.config.ser";
 	private static HashMap<String, HashMap<String, UserInfo>> cache = new HashMap<String, HashMap<String, UserInfo>>();
-	private static HashMap<String, UserInfo> hosts = new HashMap<String, UserInfo>();
-	private static HashMap<String, UserInfo> sst = new HashMap<String, UserInfo>();
+	private static HashMap<String, UserInfo> hosts;
+	private static HashMap<String, UserInfo> sst;
+	private static HashMap<String, UserInfo> hmc;
 	
 	public static void main(String args[]) {
 		if(args.length == 0) {
@@ -41,17 +42,17 @@ public class HostConfig {
 		
 		if(action.equalsIgnoreCase("-i") || action.equalsIgnoreCase("-d")) {
 			if(args.length<2 || args[1] == null) {
-				type = console.readLine("Please select the profile: \"host\" or \"sst\" :").trim();
+				type = console.readLine("Please select the profile: \"host\", \"sst\" or \"hmc\":").trim();
 			} else {
-				if(args[1].equalsIgnoreCase("host") || args[1].equalsIgnoreCase("sst")) {
+				if(args[1].equalsIgnoreCase("host") || args[1].equalsIgnoreCase("sst") || args[1].equalsIgnoreCase("hmc")) {
 					type = args[1];
 				} else {
-					type = console.readLine("Please select the profile: \"host\" or \"sst\" :").trim();
+					type = console.readLine("Please select the profile: \"host\", \"sst\" or \"hmc\":").trim();
 				}
 			}
-			if(!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("sst")) {
+			if(!type.equalsIgnoreCase("host") && !type.equalsIgnoreCase("sst") && !type.equalsIgnoreCase("hmc")) {
 				System.out.println("Input parameters error. Please check your input and try again.");
-				System.out.println("\"host\" for AS400 user profile and \"sst\" for SST user profile.");
+				System.out.println("\"host\" for AS400 user profile and \"sst\" for SST user profile and \"hmc\" for HMC user profile.");
 				return;
 			}
 		}
@@ -126,9 +127,10 @@ public class HostConfig {
 			if(load()) {
 				if(type.equalsIgnoreCase("host")) {
 					hosts.put(hostAddr, new UserInfo(userID, Base64Coder.encodeString(password)));
-				}
-				else if(type.equalsIgnoreCase("sst")) {
+				} else if(type.equalsIgnoreCase("sst")) {
 					sst.put(hostAddr, new UserInfo(userID, Base64Coder.encodeString(password)));
+				} else if(type.equalsIgnoreCase("hmc")) {
+					hmc.put(hostAddr, new UserInfo(userID, Base64Coder.encodeString(password)));
 				}
 				if(save()) {
 					refreshProfile();
@@ -187,6 +189,7 @@ public class HostConfig {
     	        cache = (HashMap<String, HashMap<String, UserInfo>>)ois.readObject();
     	        hosts = cache.get("host");
     	        sst = cache.get("sst");
+    	        hmc = cache.get("hmc");
     	        ois.close();
     		}
     		save();
@@ -200,6 +203,18 @@ public class HostConfig {
         cache = (HashMap<String, HashMap<String, UserInfo>>)ois.readObject();
         hosts = cache.get("host");
         sst = cache.get("sst");
+        hmc = cache.get("hmc");
+        
+        if(hosts == null) {
+        	hosts = new HashMap<String, UserInfo>();
+        }
+        if(sst == null) {
+        	sst = new HashMap<String, UserInfo>();
+        }
+        if(hmc == null) {
+        	hmc = new HashMap<String, UserInfo>();
+        }
+        
         ois.close();
         return true;
 	}
@@ -210,6 +225,7 @@ public class HostConfig {
         ObjectOutputStream oos = new ObjectOutputStream(gzos);
         cache.put("host", hosts);
         cache.put("sst", sst);
+        cache.put("hmc",  hmc);
         oos.writeObject(cache);
         oos.flush();
         oos.close();
@@ -228,8 +244,18 @@ public class HostConfig {
 				UserInfo userInfo = (UserInfo) entry.getValue();
 				System.out.println(host + "  " + userInfo.getUser());
 			}
+			
 			iter = sst.entrySet().iterator();
-			System.out.println("SST profiles:");
+			System.out.println("\nSST profiles:");
+			while(iter.hasNext()) {
+				Map.Entry entry = (Map.Entry) iter.next();
+				String host = (String) entry.getKey();
+				UserInfo userInfo = (UserInfo) entry.getValue();
+				System.out.println(host + "  " + userInfo.getUser());
+			}
+			
+			iter = hmc.entrySet().iterator();
+			System.out.println("\nHMC profiles:");
 			while(iter.hasNext()) {
 				Map.Entry entry = (Map.Entry) iter.next();
 				String host = (String) entry.getKey();
@@ -247,6 +273,10 @@ public class HostConfig {
 	
 	public static HashMap<String, UserInfo> getSST() {
 		return sst;
+	}
+	
+	public static HashMap<String, UserInfo> getHMC() {
+		return hmc;
 	}
 	
 	private static void showHelp() {

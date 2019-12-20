@@ -22,6 +22,7 @@ public class CheckIBMiStatus {
 	static Socket socket = null;
     
 	public static void main(String args[]) {
+//		args = new String[] {"-F", "Partitions", "-M", "HMC", "-H", "9.5.51.101"};//for debug
 		int retValue = Constants.UNKNOWN;
 		try {
 			ParseArgs(args);
@@ -47,30 +48,35 @@ public class CheckIBMiStatus {
 				String metric = argsMap.get("-M");
 				String system = argsMap.get("-H");
 				Action action = ActionFactory.get(metric);
+				StringBuffer response = new StringBuffer();
+				
 				if(!HostConfigInfo.load()) {
 					System.err.println("load file Nagios.host.java.config.ser error");
 					System.exit(retValue);
 				}
-				String user = HostConfigInfo.getUserID(system);
-				String pass = HostConfigInfo.getPassword(system);
-				if(user==null || pass==null) {
-					System.err.println("Host user profile not set");
-					System.exit(retValue);
-				}
-				String password = Base64Coder.decodeString(pass);
-				argsMap.put("-U", user);
-				argsMap.put("-P", password);
-				AS400 as400 = null;
-				String ssl = argsMap.get("-SSL");
-				if(ssl!=null && ssl.equalsIgnoreCase("Y")) {
-					as400 = new SecureAS400(system, user, password);
+				if("HMC".equalsIgnoreCase(metric)) {
+					retValue = action.execute(null, argsMap, response);
 				} else {
-					as400 = new AS400(system, user, password);
+					String user = HostConfigInfo.getUserID(system);
+					String pass = HostConfigInfo.getPassword(system);
+					if(user==null || pass==null) {
+						System.err.println("Host user profile not set");
+						System.exit(retValue);
+					}
+					String password = Base64Coder.decodeString(pass);
+					argsMap.put("-U", user);
+					argsMap.put("-P", password);
+					AS400 as400 = null;
+					String ssl = argsMap.get("-SSL");
+					if(ssl!=null && ssl.equalsIgnoreCase("Y")) {
+						as400 = new SecureAS400(system, user, password);
+					} else {
+						as400 = new AS400(system, user, password);
+					}
+					as400.setGuiAvailable(false);
+					as400.validateSignon();
+					retValue = action.execute(as400, argsMap, response);
 				}
-				as400.setGuiAvailable(false);
-				as400.validateSignon();
-				StringBuffer response = new StringBuffer();
-				retValue = action.execute(as400, argsMap, response);
 				System.out.println(response);
 			} catch (Exception e1) {
 				retValue = Constants.UNKNOWN;

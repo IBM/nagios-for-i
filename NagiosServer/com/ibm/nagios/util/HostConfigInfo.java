@@ -17,12 +17,14 @@ public class HostConfigInfo {
 	private final static String CUST_PROFILE = "/usr/local/nagios/var/profile.csv";
 	private static HashMap<String, UserInfo> hosts = null;
 	private static HashMap<String, UserInfo> sst = null;
+	private static HashMap<String, UserInfo> hmc = null;
 
 	public static boolean load() {
 		try {
 			HostConfig.load();
 			hosts = HostConfig.getHosts();
 			sst = HostConfig.getSST();
+			hmc = HostConfig.getHMC();
 	        
 			//bulk load: load profile information from profile.csv
 	        File customUserProfile = new File(CUST_PROFILE);
@@ -94,6 +96,22 @@ public class HostConfigInfo {
 	
 	public static String getSSTPassword(String system) {
 		UserInfo userInfo = sst.get(system);
+		if(userInfo != null)
+			return userInfo.getPassword();
+		else
+			return null;
+	}
+	
+	public static String getHMCUserID(String system) {
+		UserInfo userInfo = hmc.get(system);
+		if(userInfo != null)
+			return userInfo.getUser();
+		else
+			return null;
+	}
+	
+	public static String getHMCPassword(String system) {
+		UserInfo userInfo = hmc.get(system);
 		if(userInfo != null)
 			return userInfo.getPassword();
 		else

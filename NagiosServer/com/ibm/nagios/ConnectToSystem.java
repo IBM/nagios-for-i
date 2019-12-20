@@ -31,16 +31,18 @@ public class ConnectToSystem implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream(is);
 			HashMap<String, String> args = (HashMap<String, String>) ois.readObject();
 			String systemName = args.get("-H");
+			String metric = args.get("-M");
 			if(systemName == null) {
-				String metric = args.get("-M");
 				if(metric.equalsIgnoreCase("DaemonServer")) {	//check daemon server status
 					CheckIBMiStatus check = new CheckIBMiStatus(null, args);
 					check.run(response);
 				} else if(metric.equalsIgnoreCase("RefreshProfile")) {//reload HostConfigInfo
 					HostConfigInfo.load();
 				}
-			}
-			else {	//check IBM i status
+			} else if(metric.equalsIgnoreCase("HMC")) {
+				CheckIBMiStatus check = new CheckIBMiStatus(null, args);
+				retval = check.run(response);
+			} else {	//check IBM i status
 				//load user profile and password from Nagios.host.java.config.ser
 				String user = HostConfigInfo.getUserID(systemName);
 				String pass = HostConfigInfo.getPassword(systemName);

@@ -9,19 +9,24 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.CommandCall;
 import com.ibm.nagios.service.Action;
 import com.ibm.nagios.util.CommonUtil;
 import com.ibm.nagios.util.JDBCConnection;
 import com.ibm.nagios.util.Constants;
 import com.ibm.nagios.util.CustomBean;
+import com.ibm.nagios.util.CustomCommand;
 import com.ibm.nagios.util.CustomPluginFactory;
 
 public class CustomSQL implements Action {
+	CommandCall cmd = null;
+	Statement stmt = null;
+	
 	public CustomSQL(){
 	}
 
 	public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
-		Statement stmt = null;
 		ResultSet rs = null;
 		int index = 1;	//for multi value's id field
 		int count = 0;	//for record result number
@@ -45,12 +50,34 @@ public class CustomSQL implements Action {
 				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
 				return returnValue;
 			}
-			CustomBean custBean = CustomPluginFactory.get(func.toLowerCase());
+			CustomBean custBean = CustomPluginFactory.get(func);
 			if(custBean == null) {
 				response.append(Constants.retrieveDataError + " - " + "function definition not found: " + func);
 				return returnValue;
 			}
+			//if threshold not set by service, load the configuration from CustomSQL.xml
+			if(warningCap == null) {
+				warningCap = custBean.warning;
+			}
+			if(criticalCap == null) {
+				criticalCap = custBean.critical;
+			}
+			
 			stmt = connection.createStatement();
+			
+			//call the pre commands
+			if(!custBean.preCmd.isEmpty()) {
+				for(CustomCommand command : custBean.preCmd) {
+					if(command.getType().equalsIgnoreCase("CL")) {
+						if(!processClCommand(as400, command.getCommand(), response)) {
+							return returnValue;
+						}
+					} else if(command.getType().equalsIgnoreCase("SQL")) {
+						stmt.executeQuery(custBean.sqlCmd);
+					}
+				}
+			}
+			
 			rs = stmt.executeQuery(custBean.sqlCmd);
 			if(rs == null) {
 				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
@@ -162,6 +189,19 @@ public class CustomSQL implements Action {
 				returnValue = CommonUtil.getStatus(count, intWarningCap, intCriticalCap, returnValue);
 				response.insert(0, custBean.commonName + " count of record: " + count + "\n");
 			}
+			
+			//call the post commands
+			if(!custBean.postCmd.isEmpty()) {
+				for(CustomCommand command : custBean.postCmd) {
+					if(command.getType().equalsIgnoreCase("CL")) {
+						if(!processClCommand(as400, command.getCommand(), response)) {
+							return Constants.UNKNOWN;
+						}
+					} else if(command.getType().equalsIgnoreCase("SQL")) {
+						stmt.executeQuery(custBean.sqlCmd);
+					}
+				}
+			}
 		}
 		catch(Exception e) {
 			response.append(Constants.retrieveDataException + " -  " + e.toString());
@@ -182,5 +222,21 @@ public class CustomSQL implements Action {
 			}
 		}
 		return returnValue;
+	}
+	
+	private boolean processClCommand(AS400 as400, String command, StringBuffer response) throws Exception {
+		if(cmd == null) {
+			cmd = new CommandCall(as400);
+		}
+		cmd.setCommand(command);
+		boolean rc = cmd.run();
+		if(!rc) {
+			AS400Message[] msgList = cmd.getMessageList();
+			response.append(Constants.retrieveDataError).append(" - ").append("Failed to call the command:").append(command).append("\n");
+			for(AS400Message message : msgList) {
+				response.append(message.getID()).append(":").append(message.getText()).append("\n");
+			}
+		}
+		return rc;
 	}
 }

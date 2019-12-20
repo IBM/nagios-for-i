@@ -9,7 +9,12 @@ public class ActionFactory {
 		String className = classDir + "." + action;
 
 		Action actionInstance = null;
-		actionInstance = (Action)Class.forName(className).newInstance();
+		try {
+			actionInstance = (Action)Class.forName(className).newInstance();
+		} catch(ClassNotFoundException e) {
+			className = "com.ibm.nagios.hmc.service.Impl" + "." + action;
+			actionInstance = (Action)Class.forName(className).newInstance();
+		}
 		return actionInstance;
 	}
 }

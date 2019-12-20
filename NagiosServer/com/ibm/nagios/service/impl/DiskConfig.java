@@ -36,34 +36,6 @@ public class DiskConfig implements Action {
 	public DiskConfig() {
 	}
 	
-	public static void main(String[] argv) {
-		AS400 as400 = new AS400("ut25bp20.rch.stglabs.ibm.com", "zhangyan", "zhywelc0me");
-		String userID = "zhangyan";
-		String pass = "zhywelc0me";
-		int userLen = userID.length();
-		int passLen = pass.length();
-		final int ccsid = as400.getCcsid();
-		QYHCHCOP pgmCall = null;
-		StringBuffer response = new StringBuffer();
-		
-		AS400Text userText = new AS400Text(userLen, ccsid, as400);
-		AS400Text passText = new AS400Text(passLen, ccsid, as400);
-		
-		try {
-			pgmCall = new QYHCHCOP();
-			pgmCall.setParameter(pgmCall.USER_ID, userText.toBytes(userID));
-			pgmCall.setParameter(pgmCall.USER_ID_LEN, BinaryConverter.intToByteArray(userLen));
-			pgmCall.setParameter(pgmCall.PASSWORD, passText.toBytes(pass));
-			pgmCall.setParameter(pgmCall.PASSWOD_LEN, BinaryConverter.intToByteArray(passLen));
-			String receiver = pgmCall.run(as400, response);
-			if(receiver == null) {
-				System.out.println(response);
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 	public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
 		int returnValue = Constants.UNKNOWN;
 		String system = args.get("-H");
