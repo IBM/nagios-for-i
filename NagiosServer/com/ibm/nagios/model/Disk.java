@@ -11,7 +11,7 @@ public class Disk {
     private int capacity;
     private int availCap;
     private String type;
-    
+
     private int status;
     private String modle;
     private String resourceName;
@@ -21,21 +21,21 @@ public class Disk {
     }
 
     public void setModle(String modle) {
-    	this.modle = modle;
+        this.modle = modle;
     }
 
     public String getModle() {
         return modle;
     }
-    
+
     public void setResourceName(String resourceName) {
-    	this.resourceName = resourceName;
+        this.resourceName = resourceName;
     }
 
     public String getResourceName() {
         return resourceName;
     }
-    
+
     public void setASPNum(int num) {
         aNum = num;
     }

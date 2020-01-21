@@ -20,15 +20,15 @@ public class QYASPOL {
     private final String formatName_ = "YASP0300";
     private ProgramParameter errorCode_ = new ProgramParameter(BinaryConverter.intToByteArray(0));
 
-    private ProgramParameter[] parameters_ = new ProgramParameter[] { new ProgramParameter(), // receiver
-                    new ProgramParameter(), // receiver length
-                    new ProgramParameter(listLength_), // list info
-                    new ProgramParameter(BinaryConverter.intToByteArray(-1)), // records to return
-                    new ProgramParameter(BinaryConverter.intToByteArray(1)), // filter
-                    new ProgramParameter(), // filter info
-                    new ProgramParameter(), // format
-                    errorCode_, // error code
-                    new ProgramParameter() // sort info
+    private ProgramParameter[] parameters_ = new ProgramParameter[]{new ProgramParameter(), // receiver
+            new ProgramParameter(), // receiver length
+            new ProgramParameter(listLength_), // list info
+            new ProgramParameter(BinaryConverter.intToByteArray(-1)), // records to return
+            new ProgramParameter(BinaryConverter.intToByteArray(1)), // filter
+            new ProgramParameter(), // filter info
+            new ProgramParameter(), // format
+            errorCode_, // error code
+            new ProgramParameter() // sort info
     };
 
     private int rcdsReturned_ = 0;
@@ -68,10 +68,10 @@ public class QYASPOL {
     }
 
     private final int getPCLength(AS400 system) throws Exception {
-    	AS400Text text8 = null;
-    	AS400Text text4 = null;
-    	byte[] filterInfo = null;
-    	byte[] sortInfo = null;
+        AS400Text text8 = null;
+        AS400Text text4 = null;
+        byte[] filterInfo = null;
+        byte[] sortInfo = null;
         try {
             final ProgramCall pgm = new ProgramCall(system, programName_, parameters_);
             final int ccsid = system.getCcsid();
@@ -94,9 +94,9 @@ public class QYASPOL {
             parameters_[5].setInputData(filterInfo);
             parameters_[6].setInputData(text8.toBytes(formatName_));
             parameters_[8].setInputData(sortInfo);
-                
+
             if (!pgm.run()) {
-            	throw new AS400Exception(pgm.getMessageList());
+                throw new AS400Exception(pgm.getMessageList());
             }
             final byte[] listInfo = parameters_[2].getOutputData();
             rcdsReturned_ = BinaryConverter.byteArrayToInt(text4.toBytes(text4.toObject(listInfo, 4)), 0);
@@ -107,7 +107,7 @@ public class QYASPOL {
             rcdLength_ = BinaryConverter.byteArrayToInt(text4.toBytes(text4.toObject(listInfo, 12)), 0);
             int receiverLength = totalRcds * rcdLength_;
 
-            ProgramParameter[] parameters = new ProgramParameter[] { new ProgramParameter(rqsHandle_), new ProgramParameter(BinaryConverter.intToByteArray(0)) };
+            ProgramParameter[] parameters = new ProgramParameter[]{new ProgramParameter(rqsHandle_), new ProgramParameter(BinaryConverter.intToByteArray(0))};
             ProgramCall pc = new ProgramCall(system, "/QSYS.LIB/QGY.LIB/QGYCLST.PGM", parameters);
             if (!pc.run()) {
                 throw new AS400Exception(pc.getMessageList());
@@ -118,10 +118,10 @@ public class QYASPOL {
             e.printStackTrace();
             throw new Exception("QYASPOL300.getPCLength: " + e.toString());
         } finally {
-        	text8 = null;
-        	text4 = null;
-        	filterInfo = null;
-        	sortInfo = null;
+            text8 = null;
+            text4 = null;
+            filterInfo = null;
+            sortInfo = null;
         }
     }
 
@@ -130,12 +130,12 @@ public class QYASPOL {
      * appropriate list The number of records returned is 1 for each disk within the system
      */
     private final boolean collectData(AS400 system, boolean firstTime, int receiverLength) throws Exception {
-    	AS400Text text8 = null;
-    	AS400Text text4 = null;
-    	byte[] filterInfo = null;
-    	byte[] sortInfo = null;
-    	byte[] data = null;
-    	byte[] listInfo = null;
+        AS400Text text8 = null;
+        AS400Text text4 = null;
+        byte[] filterInfo = null;
+        byte[] sortInfo = null;
+        byte[] data = null;
+        byte[] listInfo = null;
         try {
             final ProgramCall pgm = new ProgramCall(system, programName_, parameters_);
             final int ccsid = system.getCcsid();
@@ -160,7 +160,7 @@ public class QYASPOL {
             parameters_[8].setInputData(sortInfo);
 
             if (!pgm.run()) {
-            	throw new AS400Exception(pgm.getMessageList());
+                throw new AS400Exception(pgm.getMessageList());
             }
 
             data = parameters_[0].getOutputData();
@@ -253,8 +253,8 @@ public class QYASPOL {
                     wRequestsBase.add(wReq);
                 }
             }
-            
-            ProgramParameter[] parameters = new ProgramParameter[] { new ProgramParameter(rqsHandle_), new ProgramParameter(BinaryConverter.intToByteArray(0)) };
+
+            ProgramParameter[] parameters = new ProgramParameter[]{new ProgramParameter(rqsHandle_), new ProgramParameter(BinaryConverter.intToByteArray(0))};
             ProgramCall pc = new ProgramCall(system, "/QSYS.LIB/QGY.LIB/QGYCLST.PGM", parameters);
             if (!pc.run()) {
                 throw new AS400Exception(pc.getMessageList());
@@ -265,15 +265,15 @@ public class QYASPOL {
             e.printStackTrace();
             throw new Exception("QYASPOL300.collectData: " + e.getMessage());
         } finally {
-        	text8 = null;
-        	text4 = null;
-        	filterInfo = null;
-        	sortInfo = null;
-        	data = null;
-        	listInfo = null;
-        	rqsHandle_ = null;
-        	errorCode_ = null;
-        	parameters_ = null;
+            text8 = null;
+            text4 = null;
+            filterInfo = null;
+            sortInfo = null;
+            data = null;
+            listInfo = null;
+            rqsHandle_ = null;
+            errorCode_ = null;
+            parameters_ = null;
         }
     }
 
@@ -298,9 +298,9 @@ public class QYASPOL {
      */
     /*
      * public Integer getTotalIO(int i) { return totalIOReq.get(i); }
-     * 
+     *
      * public Integer getReadRequests(int i) { return (rRequestsNew.get(i) - rRequestsBase.get(i)); }
-     * 
+     *
      * public Integer getWriteRequests(int i) { return (wRequestsNew.get(i) - wRequestsBase.get(i)); }
      */
 
@@ -313,9 +313,9 @@ public class QYASPOL {
     }
 
     public int getAspCount() {
-    	return aspNumSet.size();
+        return aspNumSet.size();
     }
-    
+
     public int getASPNumber(int i) {
         return aspNumber.get(i);
     }

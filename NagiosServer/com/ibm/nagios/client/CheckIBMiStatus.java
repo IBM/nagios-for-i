@@ -17,99 +17,96 @@ import com.ibm.nagios.util.HostConfigInfo;
 import com.ibm.nagios.util.Constants;
 
 public class CheckIBMiStatus {
-	private static HashMap<String, String> argsMap = new HashMap<String, String>();
+    private static HashMap<String, String> argsMap = new HashMap<String, String>();
 
-	static Socket socket = null;
-    
-	public static void main(String args[]) {
-//		args = new String[] {"-F", "Partitions", "-M", "HMC", "-H", "9.5.51.101"};//for debug
-		int retValue = Constants.UNKNOWN;
-		try {
-			ParseArgs(args);
-			socket = new Socket(Constants.SERVER, Constants.PORT);
-			socket.setReuseAddress(true);
-			socket.setSoLinger(true, 0);
-			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-			oos.writeObject(argsMap);
-			socket.shutdownOutput();
-			
-			InputStream is = socket.getInputStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			String result = null;
-			if((result=br.readLine()) != null){
-				String message;
-				while((message=br.readLine()) != null) {
-					System.out.println(message);
-				}
-				retValue = Integer.parseInt(result);
-			}
-		} catch (IOException e) {
-			try {
-				String metric = argsMap.get("-M");
-				String system = argsMap.get("-H");
-				Action action = ActionFactory.get(metric);
-				StringBuffer response = new StringBuffer();
-				
-				if(!HostConfigInfo.load()) {
-					System.err.println("load file Nagios.host.java.config.ser error");
-					System.exit(retValue);
-				}
-				if("HMC".equalsIgnoreCase(metric)) {
-					retValue = action.execute(null, argsMap, response);
-				} else {
-					String user = HostConfigInfo.getUserID(system);
-					String pass = HostConfigInfo.getPassword(system);
-					if(user==null || pass==null) {
-						System.err.println("Host user profile not set");
-						System.exit(retValue);
-					}
-					String password = Base64Coder.decodeString(pass);
-					argsMap.put("-U", user);
-					argsMap.put("-P", password);
-					AS400 as400 = null;
-					String ssl = argsMap.get("-SSL");
-					if(ssl!=null && ssl.equalsIgnoreCase("Y")) {
-						as400 = new SecureAS400(system, user, password);
-					} else {
-						as400 = new AS400(system, user, password);
-					}
-					as400.setGuiAvailable(false);
-					as400.validateSignon();
-					retValue = action.execute(as400, argsMap, response);
-				}
-				System.out.println(response);
-			} catch (Exception e1) {
-				retValue = Constants.UNKNOWN;
-				e1.printStackTrace();
-			}
-		}
-		finally {
-			try {
-				if(socket != null) {
-					socket.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		System.exit(retValue);
-	}
-	
-	private static void ParseArgs(String argv[]) {
-		String key = "";
-		String value = "";
-		for(int i=0; i<argv.length; i++) {
-			if(argv[i].startsWith("-")) {
-				key = argv[i].toUpperCase();
-				value = "";
-			}
-			else {
-				value += argv[i];
-				if(key.equalsIgnoreCase("-a")) {
-					ParseArgs(value.split(" "));
-				} else
-					argsMap.put(key, value);
-			}
-		}
-	}
+    static Socket socket = null;
+
+    public static void main(String args[]) {
+        int retValue = Constants.UNKNOWN;
+        try {
+            ParseArgs(args);
+            socket = new Socket(Constants.SERVER, Constants.PORT);
+            socket.setReuseAddress(true);
+            socket.setSoLinger(true, 0);
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(argsMap);
+            socket.shutdownOutput();
+
+            InputStream is = socket.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String result = null;
+            if ((result = br.readLine()) != null) {
+                String message;
+                while ((message = br.readLine()) != null) {
+                    System.out.println(message);
+                }
+                retValue = Integer.parseInt(result);
+            }
+        } catch (IOException e) {
+            try {
+                String metric = argsMap.get("-M");
+                String system = argsMap.get("-H");
+                Action action = ActionFactory.get(metric);
+                StringBuffer response = new StringBuffer();
+
+                if (!HostConfigInfo.load()) {
+                    System.err.println("load file Nagios.host.java.config.ser error");
+                    System.exit(retValue);
+                }
+                if ("HMC".equalsIgnoreCase(metric)) {
+                    retValue = action.execute(null, argsMap, response);
+                } else {
+                    String user = HostConfigInfo.getUserID(system);
+                    String pass = HostConfigInfo.getPassword(system);
+                    if (user == null || pass == null) {
+                        System.err.println("Host user profile not set");
+                        System.exit(retValue);
+                    }
+                    String password = Base64Coder.decodeString(pass);
+                    argsMap.put("-U", user);
+                    argsMap.put("-P", password);
+                    AS400 as400 = null;
+                    String ssl = argsMap.get("-SSL");
+                    if (ssl != null && ssl.equalsIgnoreCase("Y")) {
+                        as400 = new SecureAS400(system, user, password);
+                    } else {
+                        as400 = new AS400(system, user, password);
+                    }
+                    as400.setGuiAvailable(false);
+                    as400.validateSignon();
+                    retValue = action.execute(as400, argsMap, response);
+                }
+                System.out.println(response);
+            } catch (Exception e1) {
+                retValue = Constants.UNKNOWN;
+                e1.printStackTrace();
+            }
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.exit(retValue);
+    }
+
+    private static void ParseArgs(String argv[]) {
+        String key = "";
+        String value = "";
+        for (int i = 0; i < argv.length; i++) {
+            if (argv[i].startsWith("-")) {
+                key = argv[i].toUpperCase();
+                value = "";
+            } else {
+                value += argv[i];
+                if (key.equalsIgnoreCase("-a")) {
+                    ParseArgs(value.split(" "));
+                } else
+                    argsMap.put(key, value);
+            }
+        }
+    }
 }

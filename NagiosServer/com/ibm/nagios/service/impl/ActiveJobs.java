@@ -13,59 +13,57 @@ import com.ibm.nagios.util.JDBCConnection;
 import com.ibm.nagios.util.Constants;
 
 public class ActiveJobs implements Action {
-	public ActiveJobs(){
-	}
+    public ActiveJobs() {
+    }
 
-	public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
-		int actJobNum = 0;
-		Statement stmt = null;
-		ResultSet rs = null;
-		int returnValue = Constants.UNKNOWN;
-		
-		String warningCap = args.get("-W");
-		String criticalCap = args.get("-C");
-		int intWarningCap = (warningCap == null) ? 100 : Integer.parseInt(warningCap);
-		int intCriticalCap = (criticalCap == null) ? 100 : Integer.parseInt(criticalCap);
-		Connection connection = null;
-		try {
-			JDBCConnection JDBCConn = new JDBCConnection();
-			connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
-			if(connection == null) {
-				response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
-				return returnValue;
-			}
-			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT ACTIVE_JOBS_IN_SYSTEM FROM QSYS2.SYSTEM_STATUS_INFO");
-			if(rs == null) {
-				response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
-				return returnValue;
-			}
+    public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
+        int actJobNum = 0;
+        Statement stmt = null;
+        ResultSet rs = null;
+        int returnValue = Constants.UNKNOWN;
 
-			while(rs.next()) {
-				actJobNum=rs.getInt("ACTIVE_JOBS_IN_SYSTEM");		
-			}
+        String warningCap = args.get("-W");
+        String criticalCap = args.get("-C");
+        int intWarningCap = (warningCap == null) ? 100 : Integer.parseInt(warningCap);
+        int intCriticalCap = (criticalCap == null) ? 100 : Integer.parseInt(criticalCap);
+        Connection connection = null;
+        try {
+            JDBCConnection JDBCConn = new JDBCConnection();
+            connection = JDBCConn.getJDBCConnection(as400.getSystemName(), args.get("-U"), args.get("-P"), args.get("-SSL"));
+            if (connection == null) {
+                response.append(Constants.retrieveDataError + " - " + "Cannot get the JDBC connection");
+                return returnValue;
+            }
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery("SELECT ACTIVE_JOBS_IN_SYSTEM FROM QSYS2.SYSTEM_STATUS_INFO");
+            if (rs == null) {
+                response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
+                return returnValue;
+            }
 
-			returnValue = CommonUtil.getStatus(actJobNum, intWarningCap, intCriticalCap, returnValue);
-			response.insert(0, "Num of Active Jobs: " + actJobNum + " | 'Num of Active Jobs' = " + actJobNum + ";" + warningCap + ";" + criticalCap);
-		}
-		catch(Exception e) {
-			response.append(Constants.retrieveDataException + " - " + e.toString());
-			CommonUtil.printStack(e.getStackTrace(), response);
-			e.printStackTrace();
-		}
-		finally {
-			try {
-				if(rs != null)
-					rs.close();
-				if(stmt != null)
-					stmt.close();
-				if(connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				response.append(Constants.retrieveDataException + " - " + e.toString());
-				e.printStackTrace();
-			}
-		}
-		return returnValue;
-	}
+            while (rs.next()) {
+                actJobNum = rs.getInt("ACTIVE_JOBS_IN_SYSTEM");
+            }
+
+            returnValue = CommonUtil.getStatus(actJobNum, intWarningCap, intCriticalCap, returnValue);
+            response.insert(0, "Num of Active Jobs: " + actJobNum + " | 'Num of Active Jobs' = " + actJobNum + ";" + warningCap + ";" + criticalCap);
+        } catch (Exception e) {
+            response.append(Constants.retrieveDataException + " - " + e.toString());
+            CommonUtil.printStack(e.getStackTrace(), response);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                response.append(Constants.retrieveDataException + " - " + e.toString());
+                e.printStackTrace();
+            }
+        }
+        return returnValue;
+    }
 }
