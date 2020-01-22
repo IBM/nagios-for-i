@@ -89,7 +89,7 @@ public class CustomPluginFactory {
 //                    }
                 	String cmdType = child.getAttributes().getNamedItem("type").getNodeValue().toUpperCase();
                 	String command = child.getTextContent();
-                	if(command!=null || command!="") {
+                	if(!command.equals("")) {
                 		CustomCommand cmdObj = new CustomCommand(command, cmdType);
                 		preCmd.add(cmdObj);
                 	}
@@ -113,8 +113,8 @@ public class CustomPluginFactory {
 //                        postCmd.add(cmdObj);
 //                    }
                 	String cmdType = child.getAttributes().getNamedItem("type").getNodeValue().toUpperCase();
-                	String command = child.getTextContent();
-                	if(command!=null || command!="") {
+                	String command = child.getTextContent().trim();
+                	if(!command.equals("")) {
                 		CustomCommand cmdObj = new CustomCommand(command, cmdType);
                 		postCmd.add(cmdObj);
                 	}
