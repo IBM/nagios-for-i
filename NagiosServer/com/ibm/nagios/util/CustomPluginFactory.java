@@ -35,7 +35,7 @@ public class CustomPluginFactory {
         NodeList list = root.getElementsByTagName("func");
         Node node = null;
         Node child = null;
-        Node cmdNode = null;
+//        Node cmdNode = null;
         String funcId = null;
         String commonName = null;
         String type = null;
@@ -70,40 +70,54 @@ public class CustomPluginFactory {
                     critical = child.getTextContent();
                 }
                 if (child.getNodeName().equalsIgnoreCase("pre-cmd")) {
-                    NodeList cmdList = child.getChildNodes();
-                    for (int k = 0; k < cmdList.getLength(); k++) {
-                        cmdNode = cmdList.item(k);
-                        if (cmdNode.getNodeType() != Node.ELEMENT_NODE)
-                            continue;
-                        String command = cmdNode.getTextContent();
-                        String cmdType = cmdNode.getAttributes().getNamedItem("type").getNodeValue();
-                        if (command == null) {
-                            throw new Exception("CustomSQL.xml format error: pre command is not set:" + funcId);
-                        }
-                        if (cmdType == null) {
-                            throw new Exception("CustomSQL.xml format error: precommand type is not set:" + command);
-                        }
-                        CustomCommand cmdObj = new CustomCommand(command, cmdType);
-                        preCmd.add(cmdObj);
-                    }
+                	//TODO enable multiple commands in the future
+//                    NodeList cmdList = child.getChildNodes();
+//                    for (int k = 0; k < cmdList.getLength(); k++) {
+//                        cmdNode = cmdList.item(k);
+//                        if (cmdNode.getNodeType() != Node.ELEMENT_NODE)
+//                            continue;
+//                        String command = cmdNode.getTextContent();
+//                        String cmdType = cmdNode.getAttributes().getNamedItem("type").getNodeValue();
+//                        if (command == null) {
+//                            throw new Exception("CustomSQL.xml format error: pre command is not set:" + funcId);
+//                        }
+//                        if (cmdType == null) {
+//                            throw new Exception("CustomSQL.xml format error: precommand type is not set:" + command);
+//                        }
+//                        CustomCommand cmdObj = new CustomCommand(command, cmdType);
+//                        preCmd.add(cmdObj);
+//                    }
+                	String cmdType = child.getAttributes().getNamedItem("type").getNodeValue().toUpperCase();
+                	String command = child.getTextContent();
+                	if(command!=null || command!="") {
+                		CustomCommand cmdObj = new CustomCommand(command, cmdType);
+                		preCmd.add(cmdObj);
+                	}
                 }
                 if (child.getNodeName().equalsIgnoreCase("post-cmd")) {
-                    NodeList cmdList = child.getChildNodes();
-                    for (int k = 0; k < cmdList.getLength(); k++) {
-                        cmdNode = cmdList.item(k);
-                        if (cmdNode.getNodeType() != Node.ELEMENT_NODE)
-                            continue;
-                        String command = cmdNode.getTextContent();
-                        String cmdType = cmdNode.getAttributes().getNamedItem("type").getNodeValue();
-                        if (command == null) {
-                            throw new Exception("CustomSQL.xml format error: post command is not set:" + funcId);
-                        }
-                        if (cmdType == null) {
-                            throw new Exception("CustomSQL.xml format error: post command type is not set:" + command);
-                        }
-                        CustomCommand cmdObj = new CustomCommand(command, cmdType);
-                        postCmd.add(cmdObj);
-                    }
+                	//TODO enable multiple commands in the future
+//                    NodeList cmdList = child.getChildNodes();
+//                    for (int k = 0; k < cmdList.getLength(); k++) {
+//                        cmdNode = cmdList.item(k);
+//                        if (cmdNode.getNodeType() != Node.ELEMENT_NODE)
+//                            continue;
+//                        String command = cmdNode.getTextContent();
+//                        String cmdType = cmdNode.getAttributes().getNamedItem("type").getNodeValue();
+//                        if (command == null) {
+//                            throw new Exception("CustomSQL.xml format error: post command is not set:" + funcId);
+//                        }
+//                        if (cmdType == null) {
+//                            throw new Exception("CustomSQL.xml format error: post command type is not set:" + command);
+//                        }
+//                        CustomCommand cmdObj = new CustomCommand(command, cmdType);
+//                        postCmd.add(cmdObj);
+//                    }
+                	String cmdType = child.getAttributes().getNamedItem("type").getNodeValue().toUpperCase();
+                	String command = child.getTextContent();
+                	if(command!=null || command!="") {
+                		CustomCommand cmdObj = new CustomCommand(command, cmdType);
+                		postCmd.add(cmdObj);
+                	}
                 }
             }
 
