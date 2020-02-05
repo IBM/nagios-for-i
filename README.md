@@ -1,5 +1,5 @@
 # nagios-for-i
-
+## Description
 Nagios provides enterprise-class Open Source IT monitoring, network monitoring, server and applications monitoring.<br>
 We provide several customized plugin for monitoring IBM i systems.<br>
 You could refer to the [wiki](https://www.ibm.com/support/pages/node/1274296/ ) for more details.
@@ -10,10 +10,6 @@ You could start the daemon server by script server_start.sh.
 * You can also run the plugin without the server. Then every request will be handled by seperate processes. It would be more simple but consumes more resources.
 <br>
 The plugins suport to mornitor following martix<br>
-<br>
-For the version of Nagios Core, you could install the latest plugins by service pack in directory <b>service pack</b>.
-<br>
-For the version of Nagios XI, the plugin for IBM i has already been integrated in XI. You could update the plugins by install the latest wizard file in <b>Wizard for NagiosXI/ibmiservice.zip</b>.
 <br>
 <pre>
   <b>plugin            martix</b><br>
@@ -34,3 +30,10 @@ For the version of Nagios XI, the plugin for IBM i has already been integrated i
   TempStorageJobs   Retrieve top N jobs that have the most temp storage usage<br>
   DaemonServer      Retrieve the daemon server status<br>
 </pre>
+
+## Installation and upgrade
+For the version of Nagios Core, you could install the latest plugins by service pack in directory <b>service pack</b>.<br>
+You could take Nagios Plugin for IBM i Install and Configure Guidelines.txt for detail steps.
+<br>
+For the version of Nagios XI, the plugin for IBM i has already been integrated in XI. You could update the plugins by install the latest wizard file in <b>Wizard for NagiosXI/ibmiservice.zip</b>.
+<br>
