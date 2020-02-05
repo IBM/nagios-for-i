@@ -2,7 +2,7 @@
 ## Description
 Nagios provides enterprise-class Open Source IT monitoring, network monitoring, server and applications monitoring.<br>
 We provide several customized plugin for monitoring IBM i systems.<br>
-You could refer to the [wiki](https://www.ibm.com/support/pages/node/1274296/ ) for more details.
+You could refer to the [this link](https://www.ibm.com/support/pages/node/1274296/ ) for more details.
 <br><br>
 The nagios plugin for i has two methods. 
 * You can run the plugin with a daemon server to handle and dispatch the request to worker thread.<br>
@@ -32,8 +32,9 @@ The plugins suport to mornitor following martix<br>
 </pre>
 
 ## Installation and upgrade
-For the version of Nagios Core, you could install the latest plugins by service pack in directory <b>service pack</b>.<br>
-You could take Nagios Plugin for IBM i Install and Configure Guidelines.txt for detail steps.
+<p>For the version of Nagios Core, you could install the latest plugins by service pack in directory <b><i>service pack</i></b>.<br>
+You could take <i>Nagios Plugin for IBM i Install and Configure Guidelines.txt</i> for detail steps.
+</p>
 <br>
-For the version of Nagios XI, the plugin for IBM i has already been integrated in XI. You could update the plugins by install the latest wizard file in <b>Wizard for NagiosXI/ibmiservice.zip</b>.
+<p>For the version of Nagios XI, the plugin for IBM i has already been integrated in XI. You could update the plugins by install the latest wizard file in <b><i>Wizard for NagiosXI/ibmiservice.zip</i></b>.</p>
 <br>
