@@ -15,12 +15,15 @@
 ----------------------------------------------------------
 3.	Issue below command to add the user name and password of the system that you would like to monitor (you can use –h option to see the help):
 ----------------------------------------------------------
-	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i [host | sst]
+	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i [host | sst | hmc]
 	e.g. Add an user profile for IBM i server
 	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i host
 
 	Add an user profile for SST
 	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i sst 
+
+	Add an user profile for HMC
+	# /bin/bash /usr/local/nagios/libexec/host_config.sh -i hmc 
 
 ----------------------------------------------------------
 4.	Start the server of plugin for i and restart the nagios service
