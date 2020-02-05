@@ -317,7 +317,7 @@ public class InstallCertificate {
             //logger.info("Make sure new key store file 'jssecacerts' is copied manually to directory JAVA_HOME/lib/security/.");
             //return rc;
         } catch (Exception e) {
-            throw new Exception("SSL setup and hand shake failed: " + e.getMessage());
+            e.printStackTrace();
         } finally {
             if (socket != null) {
                 try {
