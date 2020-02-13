@@ -13,7 +13,7 @@ function ibm_i_service_configwizard_init()
     $name = "ibm-i-service";
     $args = array(
         CONFIGWIZARD_NAME => $name,
-        CONFIGWIZARD_VERSION => "1.0.0",
+        CONFIGWIZARD_VERSION => "1.0.1",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
         CONFIGWIZARD_DESCRIPTION => _("Monitor an IBM i server"),
         CONFIGWIZARD_DISPLAYTITLE => "IBM i service",
@@ -470,7 +470,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             if (have_value($usr_profile) == false || have_value($usr_password) == false) {
                 $errmsg[$errors++] = _("User profile or password not specified.");
             } else {
-                $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . $address . ' ' . $usr_profile . ' ' . $usr_password;
+                $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
                 exec($command, $ret);
                 if (strpos(implode(",", $ret), "failed") !== false) {
                     $errmsg[$errors++] = _("Register profile error:");
@@ -484,7 +484,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 if (have_value($sst_profile) == false || have_value($sst_password) == false) {
                     $errmsg[$errors++] = _("Disk Status is selected. SST profile and password must be specified.");
                 } else {
-                    $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i sst ' . $address . ' ' . $sst_profile . ' ' . $sst_password;
+                    $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i sst ' . escapeshellarg($address) . ' ' . escapeshellarg($sst_profile) . ' ' . escapeshellarg($sst_password);
                     exec($command);
                 }
             }
@@ -539,13 +539,13 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             }
 
             $output = '
-            <input type="hidden" name="ip_address" value="' . $address . '">
-            <input type="hidden" name="hostname" value="' . $hostname . '">
-            <input type="hidden" name="usr_profile" value="' . $usr_profile . '">
-            <input type="hidden" name="usr_password" value="' . $usr_password . '">
-            <input type="hidden" name="sst_profile" value="' . $sst_profile . '">
-            <input type="hidden" name="sst_password" value="' . $sst_password . '">
-            <input type="hidden" name="ssl" value="' . $ssl . '">
+            <input type="hidden" name="ip_address" value="' . encode_form_val($address) . '">
+            <input type="hidden" name="hostname" value="' . encode_form_val($hostname) . '">
+            <input type="hidden" name="usr_profile" value="' . encode_form_val($usr_profile) . '">
+            <input type="hidden" name="usr_password" value="' . encode_form_val($usr_password) . '">
+            <input type="hidden" name="sst_profile" value="' . encode_form_val($sst_profile) . '">
+            <input type="hidden" name="sst_password" value="' . encode_form_val($sst_password) . '">
+            <input type="hidden" name="ssl" value="' . encode_form_val($ssl) . '">
             <input type="hidden" name="services_serial" value="' . base64_encode(serialize($services)) . '">
             <input type="hidden" name="cust_sql_serial" value="' . base64_encode(serialize($cust_sql)) . '">
             <input type="hidden" name="cust_services_serial" value="' . base64_encode(serialize($cust_services)) . '">
