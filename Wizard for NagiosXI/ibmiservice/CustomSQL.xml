@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nagios>
+	<func id="TotalJobsNum">
+		<common-name>Total Jobs Num</common-name>
+		<type>single-value</type>
+		<sql-command><![CDATA[SELECT TOTAL_JOBS_IN_SYSTEM FROM QSYS2.SYSTEM_STATUS_INFO]]></sql-command>
+		<warning>200</warning>
+		<critical>300</critical>
+	</func>
+	<func id="TempStorageOverloadJobs">
+		<common-name>Temporary Storage Overload Jobs</common-name>
+		<type>multi-value</type>
+		<sql-command><![CDATA[SELECT SUBSTR(SUBSTR(JOB_NAME,8),POSSTR(SUBSTR(JOB_NAME,8),'/')+1)  AS JOB_NAME, TEMPORARY_STORAGE FROM TABLE(QSYS2.ACTIVE_JOB_INFO('YES', '', '', '')) X WHERE TEMPORARY_STORAGE>'100']]></sql-command>
+		<warning>1</warning>
+		<critical>3</critical>
+	</func>
+	<func id="ReplyMsg">
+		<common-name>Reply Message Num</common-name>
+		<type>list</type>
+		<sql-command><![CDATA[SELECT MESSAGE_ID, SEVERITY, MESSAGE_TEXT from qsys2.message_queue_info where Message_type = 'INQUIRY' AND MESSAGE_KEY NOT IN (select ASSOCIATED_MESSAGE_KEY from qsys2.message_queue_info where message_type = 'REPLY')]]></sql-command>
+		<warning>1</warning>
+		<critical>3</critical>
+	</func>
+</nagios>

@@ -1,0 +1,9 @@
+# ***********************************************#
+# This config file could help to load mass of system credentials automatically.
+# You need to input the system credentials as following examples.
+# After the nagios started and your systems monitored successfully, you could remove this file
+# IP_ADDRESS,USER_PROFILE,PASSWORD,PROFILE_TYPE
+# ********************************************** #
+# 1.2.3.4,user1,password1,host
+# 1.2.3.4,user1,password1,sst
+# 5.6.7.8,user2,password2,host

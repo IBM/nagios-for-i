@@ -1,0 +1,490 @@
+<?php
+// GENERIC NETWORK DEVICE CONFIG WIZARD
+//
+// Copyright (c) 2008-2009 Nagios Enterprises, LLC.  All rights reserved.
+//  
+// $Id: wizarddemo.inc.php 531 2010-08-16 21:35:38Z egalstad $
+
+//required include 
+include_once(dirname(__FILE__).'/../configwizardhelper.inc.php');
+
+// run the initialization function
+
+//for all function names, prepend function name with the wizard's name.  
+//Example: function wizarddemo_configwizard_init()
+
+wizarddemo_configwizard_init();
+
+function wizarddemo_configwizard_init(){
+	
+	//name / ID for config wizard 
+	$name="wizarddemo";
+	
+	//relevant info for wizard  
+	$args=array(
+		CONFIGWIZARD_NAME => $name,
+		CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
+		CONFIGWIZARD_DESCRIPTION => "This is a developer demo wizard that creates checks for severe weather alerts", 
+		CONFIGWIZARD_DISPLAYTITLE => "Weather Alert Wizard",
+		CONFIGWIZARD_FUNCTION => "wizarddemo_configwizard_func",
+		CONFIGWIZARD_PREVIEWIMAGE => "wizarddemo.jpg",
+		CONFIGWIZARD_VERSION => "1.0",
+		CONFIGWIZARD_DATE => "2011-06-16",
+		CONFIGWIZARD_COPYRIGHT => "Copyright &copy; 2008-2010 Nagios Enterprises, LLC.",
+		CONFIGWIZARD_AUTHOR => "Nagios Enterprises, LLC",
+		);
+	//register wizard with XI 	
+	register_configwizard($name,$args);
+	}
+
+/*	wizarddemo_configwizard_func
+*
+*	this function is automatically called by the XI wizard framework when the wizard is run
+*	
+*/
+function wizarddemo_configwizard_func($mode="",$inargs=null,&$outargs,&$result){
+
+	$wizard_name="wizarddemo";
+
+	// initialize return code and output
+	$result=0;
+	$output="";
+	
+	// initialize output args - pass back the same data we got -> used by XI framework, don't change
+	$outargs[CONFIGWIZARD_PASSBACK_DATA]=$inargs;
+
+	/*	wizard advanced depending on which mode/stage it's in.  
+	*
+	*	wizard functions with the following pattern: <show stage html> -> <validate stage> -> <show next stage html>
+	*	CONFIGWIZARD_MODE_GETSTAGE1HTML 
+	*	CONFIGWIZARD_MODE_VALIDATESTAGE1DATA:
+	*   CONFIGWIZARD_MODE_GETSTAGE2HTML			
+	*	CONFIGWIZARD_MODE_VALIDATESTAGE2DATA:   ...etc....
+	*/
+	
+	//main wizard stage switch 	
+	switch($mode){
+		case CONFIGWIZARD_MODE_GETSTAGE1HTML:
+			
+			//check to see if this is a fresh wizard run, or if we're coming back from a later stage
+			$back = htmlentities(grab_array_var($_POST,'backButton',false),ENT_QUOTES); 
+			
+			//clear any previous session data for this wizard, start a new session array 
+			if(!$back) 
+			{
+				//echo "FRESH WIZARD RUN<br />"; 				
+				unset($_SESSION['wizarddemo']); 
+				$_SESSION['wizarddemo'] = array(); //create a new session array to hold data from different stages 
+				$hostname = ''; 
+			}	
+			else //if we're coming back from a previous stage 
+			{			
+				//echo "BACK IS SET! <br />"; 
+				//grab any stored wizard variables 
+				$hostname = $_SESSION['wizarddemo']['hostname'];  
+			}
+			
+			////////////////////////begin defining html output for stage 1///////////////////////// 
+			$output='
+			<p>This wizard will create checks for severe weather alerts in defined counties. 
+			   This wizard requires a "dummy" host check to categorize the services.</p>
+			<label for="hostname">Create a Host Name for the Weather Alerts</label><br />
+			<input type="text" name="hostname" id="hostname" value="'.$hostname.'" /><br /> 
+			<p>Click <b>Next</b> to continue.</p>
+			';
+			
+			//end html output stage 1 
+			//$output string will be passed back to XI framework and rendered to browser 
+			
+			break;
+		
+		//FORM VALIDATION FOR STAGE 1 
+		case CONFIGWIZARD_MODE_VALIDATESTAGE1DATA:		
+			
+			$back = htmlentities(grab_array_var($_POST,'backButton',false),ENT_QUOTES); 	
+			//don't validate if going back
+			if($back) break;	
+
+			// get variables that were passed to us
+				//NOTE: grab_array_var is an XI wrapper function to fetch values 'if they exist' 
+				//USAGE: grab_array_var($array, $variable, $defaultValue) 
+			$hostname=grab_array_var($inargs,"hostname","");
+						
+			// check for errors
+			
+			//error count
+			$errors=0;
+			//error messages 
+			$errmsg=array();
+			//$errmsg[$errors++]="Address: '$hostname'";
+			if(have_value($hostname)==false)
+				$errmsg[$errors++]="No hostname specified.";
+			if(host_exists($hostname))
+				$errmsg[$errors++]="Host name already exists."; 
+				
+			if($errors>0){
+				$outargs[CONFIGWIZARD_ERROR_MESSAGES]=$errmsg;
+				$result=1;
+				}
+			//proceeed to next stage if there are no errors, or show stage 1 if there are errors  	
+			break;
+			
+		case CONFIGWIZARD_MODE_GETSTAGE2HTML:
+					
+			//check to see if this is a fresh wizard run, or if we're coming back from a later stage
+			$back = htmlentities(grab_array_var($_POST,'backButton',false),ENT_QUOTES); 		
+			
+			//did we come from a later stage? 
+			if(!$back)  //fresh wizard run 
+			{
+				//grab array variable from previous stage and process as needed 
+				$hostname=grab_array_var($inargs,"hostname"); 	
+				//save to session variable array for later use 
+				if(!isset($_SESSION['wizarddemo']['hostname']) ) $_SESSION['wizarddemo']['hostname'] = $hostname; 
+			}				
+			
+			//FORM REPOPULATION: do this step only if you want to repopulate form when going "back" from later stages 
+				//grab any other variables from later stages, set as '' if they aren't found
+					//suppressing error messages for these two functions with the '@' sign. 					
+			if(!isset($_SESSION['wizarddemo']['services'])) $_SESSION['wizarddemo']['services'] = array(); 
+			if(!isset($_SESSION['wizarddemo']['codes']) )   $_SESSION['wizarddemo']['codes'] = array();		
+			$services = grab_array_var($_SESSION['wizarddemo'],'services'); 
+			$svcs0 = grab_array_var($services,0,'');
+			$svcs1 = grab_array_var($services,1,'');
+			$svcs2 = grab_array_var($services,2,'');
+			$codes = grab_array_var($_SESSION['wizarddemo'],'codes'); 
+			$codes0 = grab_array_var($codes,0,''); 
+			$codes1 = grab_array_var($codes,1,'');
+			$codes2 = grab_array_var($codes,2,'');
+
+			
+			/////////////////////////////////////BEGIN HTML STAGE2///////////////////////
+			//added some functions at the bottom of this script for a cleaner form template 
+				//dropdown lists will not repopulate values upon pressing the "back" button.
+			
+			$output='						
+			<div class="sectionTitle">Weather Alert Details</div>
+			<!-- wizard explanation/description  --> 
+			<p><strong>STATE:</strong> Postal abbreviation for the state. Currently only US states supported by wizard. <br />
+			   <strong>CODE:</strong> FIPS6 or UGC code(s) for the county/ section/zone.  Multiple
+                      codes may be provided, separated by commas(with no spaces). Find
+					  county <strong>codes</strong> at the <strong>
+					  <a href="http://www.weather.gov/alerts-beta/" target="_blank" title="NOAA Home">NOAA CAP Alerts Page</a></strong>.<br />
+			   <strong>WARNING:</strong> Minimum severity to trigger a warning state<br />
+			   <strong>CRITICAL:</strong> Minimum severity to trigger a critical state
+			
+			</p><br />
+			<table class="standardtable">
+			<tr style="text-align:center;"> <!-- table header -->
+				<th>Service Description</th><th>US State</th><th>Code</th><th>Warning</th><th>Critical</th>
+			</tr>
+			<tr>
+				<td><input type="text" name="services[]" id="service1" value="'.$svcs0.'" /></td>
+				<td>'.print_state_options('state1').'</td> <!-- state select list -->
+				<td><input type="text" name="codes[]" id="code1" value="'.$codes0.'" /></td>
+				<td>'.print_threshold_options('warns[]','warn1').'</td>
+				<td>'.print_threshold_options('crits[]','crit1').'</td>
+			</tr>
+			<tr>
+				<td><input type="text" name="services[]" id="service2" value="'.$svcs1.'" /></td>
+				<td>'.print_state_options('state2').'</td> <!-- state select list -->
+				<td><input type="text" name="codes[]" id="code2" value="'.$codes1.'" /></td>
+				<td>'.print_threshold_options('warns[]','warn2').'</td>
+				<td>'.print_threshold_options('crits[]','crit2').'</td>
+			</tr>
+			<tr>
+				<td><input type="text" name="services[]" id="service3" value="'.$svcs2.'" /></td>
+				<td>'.print_state_options('state3').'</td> <!-- state select list -->
+				<td><input type="text" name="codes[]" id="code3" value="'.$codes2.'" /></td>
+				<td>'.print_threshold_options('warns[]','warn3').'</td>
+				<td>'.print_threshold_options('crits[]','crit3').'</td>
+			</tr>
+			</table>
+			';
+			//end html output string 
+			
+			break;
+		
+		//form validation stage 2 
+		case CONFIGWIZARD_MODE_VALIDATESTAGE2DATA:
+			
+			//check for 'back' button
+			$back = htmlentities(grab_array_var($_POST,'backButton',false),ENT_QUOTES); 	
+			if($back) break;	
+				
+			// get variables that were passed to us
+			//need at least one service and code to proceed, the rest have default values or will be ignored if blank  	
+			$services = grab_array_var($inargs,'services',array()); 
+			$codes = grab_array_var($inargs,'codes',array());  
+			$states = grab_array_var($inargs,'states'); 
+			
+			//DEBUG:
+			//print_r($services);
+			//print_r($codes); 
+			//print_r($states); 
+			
+			// check for errors
+			$errors=0;
+			$errmsg=array();
+			//make sure minimum amount of data exists 
+			if(!have_value($services[0]) )
+				$errmsg[$errors++]="You must specify at least one service.";
+			if(!have_value($codes[0]))
+				$errmsg[$errors++]="You must specify at least one weather location code.";
+				
+			//make sure any fields with services also have code values
+			$count = 0; 
+			foreach($services as $s)
+			{
+				if(have_value($s)) //is a service is defined 
+				{
+					//make sure there is a code value assigned for that service as well 
+					if(!have_value($codes[$count]) )
+						$errmsg[$errors++]="You have services defined without location codes."; 				
+				}
+				$count++;
+			}
+					
+			if($errors>0){
+				$outargs[CONFIGWIZARD_ERROR_MESSAGES]=$errmsg;
+				$result=1;
+				}
+				
+			break;
+			
+
+						
+		case CONFIGWIZARD_MODE_GETSTAGE3HTML:
+		
+			$back = htmlentities(grab_array_var($_POST,'backButton',false),ENT_QUOTES); 
+			
+			//prevent session arrays from being overwritten by pressing the 'back' button 
+			if(!$back)
+			{
+				// get variables that were passed to us
+				//need at least one service and code to proceed, the rest have default values or will be ignored if blank  	
+				// get variables that were passed to us	
+				$services = grab_array_var($inargs,'services'); 
+				$codes = grab_array_var($inargs,'codes');  
+				$warns = grab_array_var($inargs,'warns');
+				$crits = grab_array_var($inargs,'crits');
+				$states = grab_array_var($inargs,'states');
+						
+				/*  if I needed to process and do something with the variables I would do it here,
+				*   and then generate the next stage of html, however, this wizard doesn't require an additional stage, 
+				*   so there will be no html output string defined
+				*/
+				
+				//save processed variables to session array 
+					//this could also be done in one step in the code above, but for clarity it is done separately 								
+
+				$_SESSION['wizarddemo']['services'] = $services; 	
+				$_SESSION['wizarddemo']['codes'] = $codes;
+				$_SESSION['wizarddemo']['warns'] = $warns;
+				$_SESSION['wizarddemo']['crits'] = $crits;
+				$_SESSION['wizardemo']['states'] = $states;
+			}
+		
+			break;
+			
+		case CONFIGWIZARD_MODE_VALIDATESTAGE3DATA:
+			//no validation necessary for this stage 	
+			break;
+					
+		
+			/////////////OVERRIDE FEATURES FOR CHECK SETTINGS/////////////////
+			case CONFIGWIZARD_MODE_GETSTAGE3OPTS:
+
+				//****use this to hardcode the wizard config options ****
+					//the below options are currently the only supported options to override 
+				$outargs[CONFIGWIZARD_OVERRIDE_OPTIONS]=array(
+					"max_check_attempts" => 15,
+					"check_interval"        => 15,
+					"retry_interval"        => 15,
+					);
+					
+				//hide all form elements for this stage 
+				$result=CONFIGWIZARD_HIDE_OPTIONS;
+				
+				//html output message
+				$output.="<p><strong>Note: </strong>Manually overriding wizard options for this check settings.";
+			break;
+			
+			
+		    /////////////OVERRIDE FEATURES FOR NOTIFICATION SETTINGS/////////////////						
+            case CONFIGWIZARD_MODE_GETSTAGE4OPTS:
+
+                    //****use this to hardcode the wizard config options ****
+						//the below options are currently the only supported options to override 
+                    $outargs[CONFIGWIZARD_OVERRIDE_OPTIONS]=array(
+					   "notification_delay"        => 15,
+					   "notification_interval"        => 15,						
+					);
+					
+					
+					//hide different notification form elements
+					$outargs[CONFIGWIZARD_HIDDEN_OPTIONS] = array(
+						//the below options are currently the only supported options to hide
+						CONFIGWIZARD_HIDE_NOTIFICATION_OPTIONS,
+						CONFIGWIZARD_HIDE_NOTIFICATION_DELAY,
+						CONFIGWIZARD_HIDE_NOTIFICATION_INTERVAL,
+						CONFIGWIZARD_HIDE_NOTIFICATION_TARGETS, 
+						//NOTE: if contacts options are hidden, the user running the wizard will be set as the contact
+					);
+
+					$result=CONFIGWIZARD_HIDE_OPTIONS;
+					$output.="<p><strong>Note: </strong>Manually overriding wizard options for notification settings.";
+            break;			
+			//end override stage4 options 	
+		 		 
+		 		
+		case CONFIGWIZARD_MODE_GETFINALSTAGEHTML:
+			
+			$output='This is the final stage html, which can be used to confirm or review settings.';
+			
+			break;
+		
+		//commit the wizard data into objects definitions to be imported 
+		case CONFIGWIZARD_MODE_GETOBJECTS:
+		
+			//get the session data to turn into object configs 
+			$hostname = $_SESSION['wizarddemo']['hostname'];
+			$services = $_SESSION['wizarddemo']['services']; 
+			$states = $_SESSION['wizardemo']['states'];
+			$codes = $_SESSION['wizarddemo']['codes'];
+			$warns = $_SESSION['wizarddemo']['warns'];
+			$crits = $_SESSION['wizarddemo']['crits'];
+
+			//initialize objects array 
+			$objs=array();
+			
+			//make sure it's not a duplicate hostname 
+			if(!host_exists($hostname))
+			{
+				$objs[]=array(
+					"type" 			=> OBJECTTYPE_HOST,
+					"use" 			=> "xiwizard_wizarddemo_host",
+					"host_name"		=> $hostname,
+					"address" 		=> '127.0.0.1',
+					"_xiwizard" 	=> $wizard_name,
+					);
+			}
+				
+			//process all services for this wizard 
+			$counter = 0;
+			foreach($services as $svc)
+			{					
+				if($svc!='')
+				{
+					//echo "PROCESSING: $svc <br />"; //debugging output 
+					//pass array of config directives to the XI framework 		
+					$objs[]=array(
+							"type" 					=> OBJECTTYPE_SERVICE,
+							"host_name" 			=> $hostname,
+							"service_description" 	=> $svc,
+							"use" 					=> "xiwizard_wizarddemo_service",
+							"check_command" 		=> "check_cap!{$states[$counter]}!{$codes[$counter]}!{$warns[$counter]}!{$crits[$counter]}",
+							"_xiwizard" 			=> $wizard_name,
+							);					
+				}//end IF 
+				$counter++; 
+				
+			}//end FOREACH 
+			
+			//DEBUGGING OUTPUT:  
+			//echo "OBJECTS:<BR>";
+			//print_r($objs);
+					
+			// return the object definitions to the wizard
+			$outargs[CONFIGWIZARD_NAGIOS_OBJECTS]=$objs;
+			
+			//clear the session variables for this wizard run
+			unset($_SESSION['wizarddemo']); 
+		
+			break;
+			
+		default:
+			break;			
+		}
+		
+	return $output;
+	}
+	
+//function to print a dropdown select list of states 	
+function print_state_options($id='states1')
+{
+	$output =  "\n
+	<select name='states[]' id='{$id}'>  
+		<option value='' selected='selected'>Select a State</option> 
+		<option value='AL'>Alabama</option> 
+		<option value='AK'>Alaska</option> 
+		<option value='AZ'>Arizona</option> 
+		<option value='AR'>Arkansas</option> 
+		<option value='CA'>California</option> 
+		<option value='CO'>Colorado</option> 
+		<option value='CT'>Connecticut</option> 
+		<option value='DE'>Delaware</option> 
+		<option value='DC'>District Of Columbia</option> 
+		<option value='FL'>Florida</option> 
+		<option value='GA'>Georgia</option> 
+		<option value='HI'>Hawaii</option> 
+		<option value='ID'>Idaho</option> 
+		<option value='IL'>Illinois</option> 
+		<option value='IN'>Indiana</option> 
+		<option value='IA'>Iowa</option> 
+		<option value='KS'>Kansas</option> 
+		<option value='KY'>Kentucky</option> 
+		<option value='LA'>Louisiana</option> 
+		<option value='ME'>Maine</option> 
+		<option value='MD'>Maryland</option> 
+		<option value='MA'>Massachusetts</option> 
+		<option value='MI'>Michigan</option> 
+		<option value='MN'>Minnesota</option> 
+		<option value='MS'>Mississippi</option> 
+		<option value='MO'>Missouri</option> 
+		<option value='MT'>Montana</option> 
+		<option value='NE'>Nebraska</option> 
+		<option value='NV'>Nevada</option> 
+		<option value='NH'>New Hampshire</option> 
+		<option value='NJ'>New Jersey</option> 
+		<option value='NM'>New Mexico</option> 
+		<option value='NY'>New York</option> 
+		<option value='NC'>North Carolina</option> 
+		<option value='ND'>North Dakota</option> 
+		<option value='OH'>Ohio</option> 
+		<option value='OK'>Oklahoma</option> 
+		<option value='OR'>Oregon</option> 
+		<option value='PA'>Pennsylvania</option> 
+		<option value='RI'>Rhode Island</option> 
+		<option value='SC'>South Carolina</option> 
+		<option value='SD'>South Dakota</option> 
+		<option value='TN'>Tennessee</option> 
+		<option value='TX'>Texas</option> 
+		<option value='UT'>Utah</option> 
+		<option value='VT'>Vermont</option> 
+		<option value='VA'>Virginia</option> 
+		<option value='WA'>Washington</option> 
+		<option value='WV'>West Virginia</option> 
+		<option value='WI'>Wisconsin</option> 
+		<option value='WY'>Wyoming</option>
+	</select>\n"; 
+	
+	return $output; 
+	
+} //end print_state_options() 
+
+function print_threshold_options($name='warns[]',$id='warn1')
+{
+	//Unknown, Minor, Moderate, Severe, or Extreme
+	$output ="\n
+		<select name='{$name}' id='{$id}'>
+			<option value='Unknown'>Unknown</option>
+			<option value='Minor'>Minor</option>
+			<option value='Moderate'>Moderate</option>
+			<option value='Extreme'>Extreme</option>
+		</select> \n
+	";
+	return $output; 
+}	
+	
+?>

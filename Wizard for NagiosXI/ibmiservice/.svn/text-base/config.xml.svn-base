@@ -1,0 +1,11 @@
+<configwizard>  
+	<templates> 
+		<template filename="wizarddemo.cfg" /> 
+	</templates>
+	<plugins>
+		<plugin filename="check_cap" />
+	</plugins> 
+	<logos>
+		<logo filename="wizarddemo.jpg" /> 
+	</logos>
+</configwizard> 

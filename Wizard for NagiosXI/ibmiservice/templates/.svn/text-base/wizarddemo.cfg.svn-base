@@ -1,0 +1,24 @@
+#########################################
+## TEMPLATES
+#########################################
+
+define host {
+	name 			xiwizard_wizarddemo_host
+	use				xiwizard_generic_host
+	check_command	check_dummy!0!Weather Reports
+	register		0
+	
+}
+
+define service{
+	name			xiwizard_wizarddemo_service
+	use				xiwizard_generic_service
+	register		0
+	}
+	
+	
+define command{
+	command_name    check_cap
+	command_line    $USER1$/check_cap -s $ARG1$ -l $ARG2$ -w $ARG3$ -c $ARG4$
+	}
+	

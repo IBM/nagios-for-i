@@ -1,0 +1,38 @@
+Naming conventions for wizard files.  
+
+Example for Wizard Named "wizardemo.zip":
+
+- All files must be placed inside of a directory called "wizarddemo", and once completed the 
+
+SCRIPTS:
+-The main include file must be named wizarddemo.inc.php
+	- Any additional includes referenced by the wizarddemo.inc.php file don't require a naming convention 
+
+ADDITIONAL FILES:
+- Any additional files with a config wizard must be specified in a file called config.xml.  Example below:
+
+<configwizard> 
+	<templates> 
+		<template filename="wizarddemo.cfg" /> 
+	</templates>
+	<plugins>
+		<plugin filename="check_cap" />
+	</plugins> 
+	<logos>
+		<logo filename="wizarddemo.png" /> 
+	</logos>
+</configwizard> 
+
+
+LOGOS:
+- must be placed in a "logos" directory and named wizarddemo.png or wizarddemo.jpg, etc.  
+
+PLUGINS:
+- plugin filenames be placed in a directory called "plugins" and must match the name specified in the config.xml file
+
+CONFIG TEMPLATES
+- Config templates and definitions must be placed in a "templates" directory and defined in a 
+  file named <wizardname>.cfg. Example: wizarddemo.cfg   
+- New host or service template definitions must be named with the following convention:
+	xiwizard_wizarddemo_service
+	xiwizard_wizarddemo_host

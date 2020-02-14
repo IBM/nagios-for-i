@@ -1,0 +1,20 @@
+<configwizard>  
+	<templates> 
+		<template filename="ibmiservice.cfg" /> 
+	</templates>
+	<plugins>
+		<plugin filename="check_daemon_status.sh" />
+		<plugin filename="check_ibmi_status.sh" />
+		<plugin filename="check_version.sh" />
+		<plugin filename="host_config.sh" />
+		<plugin filename="ibmi_init.sh" />
+		<plugin filename="server_restart.sh" />
+		<plugin filename="server_start.sh" />
+		<plugin filename="server_stop.sh" />
+		<plugin filename="jt400.jar" />
+		<plugin filename="nagios4i.jar" />
+	</plugins>
+	<logos>
+		<logo filename="ibmi.png" /> 
+	</logos>
+</configwizard> 
