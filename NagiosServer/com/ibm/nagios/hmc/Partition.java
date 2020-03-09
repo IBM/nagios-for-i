@@ -1,23 +1,3 @@
-/* begin_generated_IBM_copyright_prolog                             */
-/*                                                                  */
-/* This is an automatically generated copyright prolog.             */
-/* After initializing,  DO NOT MODIFY OR MOVE                       */
-/* ---------------------------------------------------------------- */
-/* IBM Confidential                                                 */
-/*                                                                  */
-/* (C)Copyright IBM Corp.  2017, 2017                               */
-/*                                                                  */
-/* The Source code for this program is not published  or otherwise  */
-/* divested of its trade secrets,  irrespective of what has been    */
-/* deposited with the U.S. Copyright Office.                        */
-/*  --------------------------------------------------------------- */
-/*                                                                  */
-/* end_generated_IBM_copyright_prolog                               */
-/* Change Log ------------------------------------------------------*/
-/*                                                                  */
-/*  Flag  Reason   Version Userid    Date        Description        */
-/*  ----  -------- ------- --------  ----------  -----------        */
-/* End Change Log --------------------------------------------------*/
 package com.ibm.nagios.hmc;
 
 public class Partition {
