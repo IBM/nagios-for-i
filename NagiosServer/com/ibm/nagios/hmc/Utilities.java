@@ -190,7 +190,6 @@ public class Utilities {
             "5624",//4-Port 1Gb Integrated Virtual Ethernet Daughter Card
             "5717",//4-Port 10/100/1000 Base-TX PCI Express Adapter
             "5271",
-
     };
 
     public static final String[] FeatureCodesList2 = new String[]{
@@ -209,35 +208,6 @@ public class Utilities {
             "5613",//Dual Port (SR) Integrated Virtual Ethernet 10Gb Daughter Card
             "5623",//Dual Port 1Gb Integrated Virtual Ethernet Daughter Card
             "EN22",//2-Port 10Gb Fibre Channel over Ethernet (FC0E) or Converged Network Adapter
-
-            //RoCE
-//				"EC2M",//PCIe3 2-Port 10 GbE NIC and RoCE SR Adapter
-//				"EC2N",
-//				"EL40",
-//				"EC37",//PCIe3 2-port 10 GbE NIC and RoCE SFP+ Copper Adapter
-//				"EC38",
-//				"EC3X",
-//				"EC3A",//PCIe3 2-port 40GbE NIC RoCE QSFP+ Adapter
-//				"EC3B",
-//				"EC27",//PCIe2 LP 2-port 10GbE RoCE SFP+ Adapter (NIC Only)
-//				"EC28",
-//				"EC29",
-//				"EC30",
-//				"EC3L",//2-Port 100Gb RoCE QSFP28 PCIe 3.0 x16 Adapter
-//				"EC3M",
-//				"EL27",//PCIe2 LP 2-Port 10GbE RoCE SFP+ adapter
-//				"EL2Z",//PCIe2 LP 2-Port 10 GbE RoCE SR adapter
-//				"EL3X",//PCIe3 2-Port 10 GbE NIC and RoCE SR adapter
-//				"EL53",//PCIe3 2-Port 10 GbE NIC and RoCE SR adapter
-//				"EL54",//PCIe3 2-port 10 GbE NIC and RoCE SR adapter
-//				"EC2R",//PCIe3 2-port 10 Gb NIC & RoCE SR/Cu adapter
-//				"EC2S",
-//				"EC2T",//PCIe3 2-port 25/10 Gb NIC & RoCE SFP28 adapter
-//				"EC2U",
-//				"EC3L",//PCIe3 2-port 100 GbE NIC & RoCE QSFP28 Adapter
-//				"EC3M",
-//				"EC66",//PCIe4 2-port 100 GbE RoCE x16 adapter 
-//				"EC67",
     };
 
     public static final String[] FeatureCodesList1 = new String[]{
@@ -257,6 +227,5 @@ public class Utilities {
             "EN10",//Integrated Multi-Function Card
             "EN11",
             "5772",//10 Gigabit Ethernet-LR PCI Express Adapter
-
     };
 }

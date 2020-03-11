@@ -5,12 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -23,7 +19,6 @@ import com.ibm.nagios.hmc.cert.InstallCertificate;
  * This is a wrapper class for Java HTTP request and response operations,
  * mainly used by HMC commands to send REST requests and analyze the responses.
  *
- * @author panwang
  */
 public class HTTPRequestUtilities {
     public static int rc = HttpsURLConnection.HTTP_OK;
@@ -42,13 +37,6 @@ public class HTTPRequestUtilities {
     /**
      * Send request to server.
      *
-     * @param sURL
-     * @param method
-     * @param contentType
-     * @param header
-     * @param body
-     * @return
-     * @throws MRDBSetupException
      */
     private static synchronized InputStream sendRequest(String sURL, String method, String contentType, Map<String, String> header, String body) throws Exception {
         DataOutputStream wr = null;
@@ -97,7 +85,6 @@ public class HTTPRequestUtilities {
 
             if (body != null) {//POST and PUT need a body
                 wr = new DataOutputStream(con.getOutputStream());
-                //wr.writeBytes(body);
                 wr.write(body.getBytes());//changed to this, in order to fix the messy code issue when there are Chinese characters
                 wr.flush();
             }
@@ -105,12 +92,7 @@ public class HTTPRequestUtilities {
             int responseCode = con.getResponseCode();
             rc = responseCode;//save it for future use
             if (responseCode < HttpsURLConnection.HTTP_OK
-                    || responseCode >= HttpsURLConnection.HTTP_MULT_CHOICE) {//something wrong (return code is not 20X), log it and return
-//				MRDBLogger.getLogger().logInFileOnly("HTTPRequestUtilities.sendRequest()::" + "method=" + method +
-
-//					"contentType=" + contentType +
-//					"body=" + body +
-//					"ResponseCode=" + responseCode, Message.LEVEL.ERROR);
+                    || responseCode >= HttpsURLConnection.HTTP_MULT_CHOICE) {
                 //log the error response
                 InputStream err_is = con.getErrorStream();
                 if (err_is != null) {
@@ -149,24 +131,10 @@ public class HTTPRequestUtilities {
      *
      * @param sURL        REST URL
      * @param contentType request contentType
-     * @param headers     request header
-     * @param body        request boby
-     * @return the output stream of the response
-     * @throws MRDBSetupException
-     */
-    public static InputStream sendPutRequest(String sURL, String contentType, Map<String, String> headers, Map<String, String> bodyParams) throws Exception {
-        return sendRequest(sURL, "PUT", contentType, headers, getURLParams(bodyParams));
-    }
-
-    /**
-     * Send PUT request to HMC server.
-     *
-     * @param sURL        REST URL
-     * @param contentType request contentType
      * @param header      request header
      * @param body        request boby
      * @return the output stream of the response
-     * @throws MRDBSetupException
+     * @throws Exception
      */
     public static InputStream sendPutRequest(String sURL, String contentType, String header, String body) throws Exception {
         Map<String, String> headers = new HashMap<String, String>();
@@ -177,30 +145,13 @@ public class HTTPRequestUtilities {
     }
 
     /**
-     * Send DELETE request to HMC server.
-     *
-     * @param sURL        REST URL
-     * @param contentType request contentType
-     * @param headers     request header
-     * @return the output stream of the response
-     * @throws MRDBSetupException
-     */
-    public static InputStream sendDeleteRequest(String sURL, String contentType, Map<String, String> headers) throws Exception {
-        return sendRequest(sURL, "DELETE", contentType, headers, null);
-    }
-
-    public static InputStream sendDeleteRequest(String sURL, String contentType, Map<String, String> headers, Map<String, String> bodyParams) throws Exception {
-        return sendRequest(sURL, "DELETE", contentType, headers, getURLParams(bodyParams));
-    }
-
-    /**
      * Send GET request to HMC server.
      *
      * @param sURL        REST URL
      * @param contentType request contentType
      * @param header      request header
      * @return the output stream of the response
-     * @throws MRDBSetupException
+     * @throws Exception
      */
     public static InputStream sendGetRequest(String sURL, String contentType, String header) throws Exception {
         Map<String, String> headers = new HashMap<String, String>();
@@ -209,84 +160,4 @@ public class HTTPRequestUtilities {
             headers.put(HMCConstants.XML_SESSION_ID, header);
         return sendRequest(sURL, "GET", contentType, headers, null);
     }
-
-    /**
-     * Send GET request to HMC server.
-     *
-     * @param sURL        REST URL
-     * @param contentType request contentType
-     * @param headers     request headers
-     * @return the output stream of the response
-     * @throws MRDBSetupException
-     */
-    public static InputStream sendGetRequest(String sURL, String contentType, Map header) throws Exception {
-        return sendRequest(sURL, "GET", contentType, header, null);
-    }
-
-    /**
-     * Send POST request to HMC server.
-     *
-     * @param sURL        REST URL
-     * @param contentType request contentType
-     * @param header      request header
-     * @param body        request boby
-     * @return the output stream of the response
-     * @throws MRDBSetupException
-     */
-    public static InputStream sendPostRequest(String sURL, String contentType, String header, String body) throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        //The default header used here is X-API-Session
-        if (header != null)
-            headers.put(HMCConstants.XML_SESSION_ID, header);
-        return sendRequest(sURL, "POST", contentType, headers, body);
-    }
-
-    public static InputStream sendPostRequest(String sURL, String contentType, Map<String, String> headers, String body) throws Exception {
-        return sendRequest(sURL, "POST", contentType, headers, body);
-    }
-
-    /**
-     * Send POST request to HMC server.
-     *
-     * @param sURL        REST URL
-     * @param contentType request contentType
-     * @param headers     request header
-     * @param body        request boby
-     * @return the output stream of the response
-     * @throws MRDBSetupException
-     */
-    public static InputStream sendPostRequest(String sURL, String contentType, Map<String, String> headers, Map<String, String> bodyParams) throws Exception {
-        return sendRequest(sURL, "POST", contentType, headers, getURLParams(bodyParams));
-    }
-
-
-    private static String getURLParams(Map<String, ?> params) {
-        if (params == null) {
-            return null;
-        }
-        final StringBuilder sb = new StringBuilder();
-        final Iterator<String> itNames = params.keySet().iterator();
-        while (itNames.hasNext()) {
-            final String name = itNames.next();
-            final Object value = params.get(name);
-            if (value != null) {
-                sb.append(name).append("=").append(encode(value.toString()));
-                if (itNames.hasNext()) {
-                    sb.append("&");
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    private static String encode(String s) {
-        String encoded = s;
-        try {
-            encoded = URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
-        return encoded;
-    }
-
-
 }
