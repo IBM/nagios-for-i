@@ -127,46 +127,68 @@ function ibm_i_customsql_configwizard_func($mode = "", $inargs = null, &$outargs
                 for ($x = 0; $x < count($cust_sql); $x++) {
                     $output .= '
                     <tr>
-                        <td><input type="text" size="30" name="cust_sql[' . $x . '][id]" id="function_id" value="' . encode_form_val($cust_sql[$x]["id"]) . '" class="form-control"></td>
-                        <td><input type="text" size="30" name="cust_sql[' . $x . '][common-name]" id="common-name" value="' . encode_form_val($cust_sql[$x]["common-name"]) . '" class="form-control"></td>
                         <td>
-                            <select name="cust_sql[' . $x . '][type]" id="type" value="' . encode_form_val($cust_sql[$x]["type"]) . '" class="form-control">
-                                <option value="single-value"' . is_selected($cust_sql[$x]["type"], "single-value") . ' >single value</option>
-                                <option value="multi-value"' . is_selected($cust_sql[$x]["type"], "multi-value") . ' >multiple value</option>
-                                <option value="list"' . is_selected($cust_sql[$x]["type"], "list") . ' >list</option>
-                            </select>
+                            <div>
+                                <input type="text" size="30" name="cust_sql[' . $x . '][id]" id="function_id" value="' . encode_form_val($cust_sql[$x]["id"]) . '" class="form-control">
+                            </div>
+                            <div><p>&nbsp;</p></div>
+                            <div><p>&nbsp;</p></div>
                         </td>
-                        <td><label><img src="'.theme_image('error.png').'" class="tt-bind" title="'._('Warning Threshold').'"></label>
-                            <input type="text" size="2" name="cust_sql['.$x.'][warning]" value="' . encode_form_val($cust_sql[$x]["warning"]) . '" class="form-control condensed">&nbsp;
-                            <label><img src="'.theme_image('critical_small.png').'" class="tt-bind" title="'._('Critical Threshold').'"></label>
-                            <input type="text" size="2" name="cust_sql['.$x.'][critical]" value="' . encode_form_val($cust_sql[$x]["critical"]) . '" class="form-control condensed">
+                        <td>
+                            <div>
+                                <input type="text" size="30" name="cust_sql[' . $x . '][common-name]" id="common-name" value="' . encode_form_val($cust_sql[$x]["common-name"]) . '" class="form-control">
+                            </div>
+                            <div><p>&nbsp;</p></div>
+                            <div><p>&nbsp;</p></div>
                         </td>
-                        <td><input type="text" size="100" name="cust_sql[' . $x . '][sql-command]" id="sql-command" value="' . encode_form_val($cust_sql[$x]["sql-command"]) . '" class="form-control"></td>
+                        <td>
+                            <div>
+                                <select name="cust_sql[' . $x . '][type]" id="type" value="' . encode_form_val($cust_sql[$x]["type"]) . '" class="form-control">
+                                    <option value="single-value"' . is_selected($cust_sql[$x]["type"], "single-value") . ' >single value</option>
+                                    <option value="multi-value"' . is_selected($cust_sql[$x]["type"], "multi-value") . ' >multiple value</option>
+                                    <option value="list"' . is_selected($cust_sql[$x]["type"], "list") . ' >list</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p>pre-command</p>
+                            </div>
+                            <div>
+                                <p>post-command</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <label><img src="'.theme_image('error.png').'" class="tt-bind" title="'._('Warning Threshold').'"></label>
+                                <input type="text" size="2" name="cust_sql['.$x.'][warning]" value="' . encode_form_val($cust_sql[$x]["warning"]) . '" class="form-control condensed">&nbsp;
+                                <label><img src="'.theme_image('critical_small.png').'" class="tt-bind" title="'._('Critical Threshold').'"></label>
+                                <input type="text" size="2" name="cust_sql['.$x.'][critical]" value="' . encode_form_val($cust_sql[$x]["critical"]) . '" class="form-control condensed">
+                            </div>
+                            <div>
+                                <select name="cust_sql[' . $x . '][pre-cmd-type]" id="pre-cmd-type" value="' . encode_form_val($cust_sql[$x]["pre-cmd-type"]) . '" class="form-control">
+                                    <option value="CL"' . is_selected($cust_sql[$x]["pre-cmd-type"], "CL") . ' >CL Command</option>
+                                    <option value="SQL"' . is_selected($cust_sql[$x]["pre-cmd-type"], "SQL") . ' >SQL Service</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select name="cust_sql[' . $x . '][post-cmd-type]" id="post-cmd-type" value="' . encode_form_val($cust_sql[$x]["post-cmd-type"]) . '" class="form-control">
+                                    <option value="CL"' . is_selected($cust_sql[$x]["post-cmd-type"], "CL") . ' >CL Command</option>
+                                    <option value="SQL"' . is_selected($cust_sql[$x]["post-cmd-type"], "SQL") . ' >SQL Service</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input type="text" size="100" name="cust_sql[' . $x . '][sql-command]" id="sql-command" value="' . encode_form_val($cust_sql[$x]["sql-command"]) . '" class="form-control">
+                            </div>
+                            <div>
+                                <input type="text" size="100" name="cust_sql[' . $x . '][pre-cmd]" id="pre-cmd" value="' . encode_form_val($cust_sql[$x]["pre-cmd"]) . '" class="form-control">
+                            </tdivr>
+                            <div>
+                                <input type="text" size="100" name="cust_sql[' . $x . '][post-cmd]" id="post-command" value="' . encode_form_val($cust_sql[$x]["post-cmd"]) . '" class="form-control">
+                            </div>
+                        </td>
                     </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td><p>pre-command</p></td>
-                        <td>
-                            <select name="cust_sql[' . $x . '][pre-cmd-type]" id="pre-cmd-type" value="' . encode_form_val($cust_sql[$x]["pre-cmd-type"]) . '" class="form-control">
-                                <option value="CL"' . is_selected($cust_sql[$x]["pre-cmd-type"], "CL") . ' >CL Command</option>
-                                <option value="SQL"' . is_selected($cust_sql[$x]["pre-cmd-type"], "SQL") . ' >SQL Service</option>
-                            </select>
-                        </td>
-                        <td><input type="text" size="100" name="cust_sql[' . $x . '][pre-cmd]" id="pre-cmd" value="' . encode_form_val($cust_sql[$x]["pre-cmd"]) . '" class="form-control"></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td><p>post-command</p></td>
-                        <td>
-                            <select name="cust_sql[' . $x . '][post-cmd-type]" id="post-cmd-type" value="' . encode_form_val($cust_sql[$x]["post-cmd-type"]) . '" class="form-control">
-                                <option value="CL"' . is_selected($cust_sql[$x]["post-cmd-type"], "CL") . ' >CL Command</option>
-                                <option value="SQL"' . is_selected($cust_sql[$x]["post-cmd-type"], "SQL") . ' >SQL Service</option>
-                            </select>
-                        </td>
-                        <td><input type="text" size="100" name="cust_sql[' . $x . '][post-cmd]" id="post-command" value="' . encode_form_val($cust_sql[$x]["post-cmd"]) . '" class="form-control"></td>
-                    </tr>';
+                    ';
                 }
 
                 $output .= '</table>';
