@@ -115,6 +115,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             }
             $hostname = grab_array_var($inargs, "hostname", $ha);
             $hostname = nagiosccm_replace_user_macros($hostname);
+            $server_type = grab_array_var($inargs, "server_type");
             $usr_profile = grab_array_var($inargs, "usr_profile");
             $usr_password = grab_array_var($inargs, "usr_password");
             $sst_profile = grab_array_var($inargs, "sst_profile");
@@ -144,6 +145,10 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $services_default[13] = "off";
                 $services_default[14] = "off";
                 $services_default[15] = "off";
+                $services_default[16] = "off";
+                $services_default[17] = "off";
+                $services_default[18] = "off";
+                $services_default[19] = "off";
                 $services = grab_array_var($inargs, "services", $services_default);
             }
 
@@ -156,7 +161,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $serviceargs_default = array(
                     array()
                 );
-                for ($x = 0; $x < 16; $x++) {
+                for ($x = 0; $x < 20; $x++) {
                     if ($x == 0) {
                         $serviceargs_default[$x]['description'] = 'CPU Utilization';
                         $serviceargs_default[$x]['metric'] = 'CPU';
@@ -261,6 +266,26 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                         $serviceargs_default[$x]['metric'] = 'DiskConfig';
                         $serviceargs_default[$x]['args'] = '';
                         $serviceargs_default[$x]['name'] = 'Disk Status';
+                    } else if ($x == 16) {
+                        $serviceargs_default[$x]['description'] = 'Management Console Version';
+                        $serviceargs_default[$x]['metric'] = 'ManagementConsoleVersion';
+                        $serviceargs_default[$x]['args'] = '';
+                        $serviceargs_default[$x]['name'] = 'Management Console Version';
+                    } else if ($x == 17) {
+                        $serviceargs_default[$x]['description'] = 'HMC Managed Systems';
+                        $serviceargs_default[$x]['metric'] = 'Systems';
+                        $serviceargs_default[$x]['args'] = '';
+                        $serviceargs_default[$x]['name'] = 'Systems';
+                    } else if ($x == 18) {
+                        $serviceargs_default[$x]['description'] = 'HMC Managed Partitions';
+                        $serviceargs_default[$x]['metric'] = 'Partitions';
+                        $serviceargs_default[$x]['args'] = '';
+                        $serviceargs_default[$x]['name'] = 'Partitions';
+                    } else if ($x == 19) {
+                        $serviceargs_default[$x]['description'] = 'Check the Partitions Status from IBM i';
+                        $serviceargs_default[$x]['metric'] = 'SpecificPartition';
+                        $serviceargs_default[$x]['args'] = '-FOI ReferenceCode -PARNAME XXXXXXXX -EXPVAL 00000000';
+                        $serviceargs_default[$x]['name'] = 'Specific Partition';
                     }
                 }
 
@@ -287,6 +312,16 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
         <td>
             <input type="text" size="20" name="hostname" id="hostname" value="' . encode_form_val($hostname) . '" class="form-control">
             <div class="subtext">' . _("The name you'd like to have associated with this host") . '.</div>
+        </td>
+        <td class="vt">
+            <label for="server_type">'._("Server Type").':</label>
+        </td>
+        <td>
+            <select name="server_type" id="server_type" class="form-control">
+                <option value="IBMi" ' . is_selected($server_type, "IBMi") . '>' . _('IBM i (Default)') . '</option>
+                <option value="HMC" ' . is_selected($server_type, "HMC") . '>' . _('HMC') . '</option>
+            </select>
+            <div class="subtext">' . _('Determines whether or not data between the Nagios XI server and IBM i server is encrypted') . '.</div>
         </td>
     </tr>
     <tr>
@@ -329,7 +364,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
         <th>' . _('Command Args') . '</th>
     </tr>';
 
-            for ($x = 0; $x < count($serviceargs); $x++) {
+            for ($x = 0; $x < 16; $x++) {
 
                 $description = encode_form_val($serviceargs[$x]['description']);
                 $commandargs = encode_form_val($serviceargs[$x]['args']);
@@ -388,6 +423,45 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                     </td>
                 </tr>
             </div>';
+            $output .= '<br>
+<h5 class="ul">' . _('HMC Plugin Service') . '</h5>
+<table class="table table-condensed table-no-border table-auto-width" style="margin: 0;">
+    <tr>
+        <th></th>
+        <th>' . _('Display Name') . '</th>
+        <th>' . _('Monitored Metric') . '</th>
+        <th>' . _('Command Args') . '</th>
+    </tr>';
+            for ($x = 16; $x < 20; $x++) {
+
+                $description = encode_form_val($serviceargs[$x]['description']);
+                $commandargs = encode_form_val($serviceargs[$x]['args']);
+                $commandname = encode_form_val($serviceargs[$x]['name']);
+                $metric = encode_form_val($serviceargs[$x]['metric']);
+                $is_service_checked = (isset($services[$x]) ? is_checked($services[$x]) : '');
+
+                $output .= '
+    <tr>
+        <td><input type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control"></td>
+        <td><input type="text" size="25" name="serviceargs[' . $x . '][name]" value="' . $commandname . '" class="form-control"></td>
+        <td><input type="text" size="35" name="serviceargs[' . $x . '][description]" value="' . $description . '" class="form-control" readonly></td>
+        <td><input type="text" size="100" name="serviceargs[' . $x . '][args]" value="' . $commandargs . '" class="form-control"></td>
+        <td><input type="hidden" name="serviceargs[' . $x . '][metric]" value="' . $metric . '"></td>
+    </tr>';
+            }
+            $output .= '
+    <div class="subtext">Following plugin are used to monitor HMC servers. There are some parameters used to configure the certificate store and HMC rest service. If you specify the parameter plugins will be called by your configuration. If not plugins will use the default value.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;-KSPASS - password of the default certificate keystore. Default value is "changeit".<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;-PORT - The port number of HMC rest service. Default value is "12443".
+    </div>
+</table>
+<p>For the plugin Specific Partition there are some parameters required.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-HMCIP - the IP address of the HMC server which current IBM i server belog to.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-FOI - the field of interest. It specifies the field you want to monitor.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-PARNAME - Partition name. The name of the partition you want to check.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-EXPVAL - Expect value. The expect value of the interested field. It will compare the value returned from server and the expect value to report the status.</p>';
+
+
 
             $xml = new XMLReader ();
             $xml->open('/usr/local/nagios/etc/objects/CustomSQL.xml');
@@ -454,6 +528,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             // Get variables that were passed to us
             $address = grab_array_var($inargs, "ip_address");
             $hostname = grab_array_var($inargs, "hostname");
+            $server_type = grab_array_var($inargs, "server_type");
             $usr_profile = grab_array_var($inargs, "usr_profile");
             $usr_password = grab_array_var($inargs, "usr_password");
             $sst_profile = grab_array_var($inargs, "sst_profile");
@@ -470,7 +545,11 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             if (have_value($usr_profile) == false || have_value($usr_password) == false) {
                 $errmsg[$errors++] = _("User profile or password not specified.");
             } else {
+                if($server_type == "IBMi") {
                 $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
+                } elseif($server_type == "HMC") {
+                    $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i hmc ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
+                }
                 exec($command, $ret);
                 if (strpos(implode(",", $ret), "failed") !== false) {
                     $errmsg[$errors++] = _("Register profile error:");
@@ -500,7 +579,8 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             // Get variables that were passed to us
             $address = grab_array_var($inargs, "ip_address");
             $hostname = grab_array_var($inargs, "hostname");
-            $ssl = grab_array_var($inargs, "ssl", "on");
+            $ssl = grab_array_var($inargs, "ssl", "off");
+            $server_type = grab_array_var($inargs, "server_type");
             $usr_profile = grab_array_var($inargs, "usr_profile");
             $usr_password = grab_array_var($inargs, "usr_password");
             $sst_profile = grab_array_var($inargs, "sst_profile");
@@ -546,6 +626,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             <input type="hidden" name="sst_profile" value="' . encode_form_val($sst_profile) . '">
             <input type="hidden" name="sst_password" value="' . encode_form_val($sst_password) . '">
             <input type="hidden" name="ssl" value="' . encode_form_val($ssl) . '">
+            <input type="hidden" name="server_type" value="' . encode_form_val($server_type) . '">
             <input type="hidden" name="services_serial" value="' . base64_encode(serialize($services)) . '">
             <input type="hidden" name="cust_sql_serial" value="' . base64_encode(serialize($cust_sql)) . '">
             <input type="hidden" name="cust_services_serial" value="' . base64_encode(serialize($cust_services)) . '">
@@ -612,7 +693,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
 
             // See which services we should monitor
 
-            for ($x = 0; $x < count($serviceargs); $x++) {
+            for ($x = 0; $x < 16; $x++) {
                 if(!(isset($services[$x]) ? is_checked($services[$x]) : ''))
                     continue;
 
@@ -622,7 +703,29 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $pdesc = $serviceargs[$x]["description"];
 
 
-                $checkcommand = "check_ibmi!" . $pname . "!" . $sslargs  . "!" . $serviceargs[$x]["warning"] . "!" . $serviceargs[$x]["critical"] . "!" .$serviceargs[$x]["args"];
+                $checkcommand = "check_ibmi!" . $pname . "!" . $sslargs  . "!" . $serviceargs[$x]["warning"] . "!" . $serviceargs[$x]["critical"] . "!" . $pargs;
+
+                $objs[] = array(
+                    "type" => OBJECTTYPE_SERVICE,
+                    "host_name" => $hostname,
+                    "service_description" => $pdesc,
+                    "use" => "generic-service",
+                    "check_command" => $checkcommand,
+                    "_xiwizard" => $wizard_name,
+                );
+            }
+
+            for ($x = 16; $x < 20; $x++) {
+                if(!(isset($services[$x]) ? is_checked($services[$x]) : ''))
+                    continue;
+
+                $displayname = $serviceargs[$x]["name"];
+                $pname = $serviceargs[$x]["metric"];
+                $pargs = $serviceargs[$x]["args"];
+                $pdesc = $serviceargs[$x]["description"];
+
+
+                $checkcommand = "check_hmc!" . $sslargs . "!" . $pname . "!" . $pargs;
 
                 $objs[] = array(
                     "type" => OBJECTTYPE_SERVICE,
