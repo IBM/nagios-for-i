@@ -115,12 +115,12 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             }
             $hostname = grab_array_var($inargs, "hostname", $ha);
             $hostname = nagiosccm_replace_user_macros($hostname);
-            $server_type = grab_array_var($inargs, "server_type");
             $usr_profile = grab_array_var($inargs, "usr_profile");
             $usr_password = grab_array_var($inargs, "usr_password");
             $sst_profile = grab_array_var($inargs, "sst_profile");
             $sst_password = grab_array_var($inargs, "sst_password");
             $ssl = grab_array_var($inargs, "ssl");
+            $server_type = grab_array_var($inargs, "server_type");
 
             $services = "";
             $services_serial = grab_array_var($inargs, "services_serial", "");
@@ -294,6 +294,54 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
 
             $output = '
 <input type="hidden" name="ip_address" value="' . encode_form_val($address) . '">
+<script type="text/javascript">
+    $(function(){
+        $("#server_type").change(function(e){
+        console.log("enter change function");
+        var type = $("#server_type").val();
+
+        if(type == "IBMi") {
+            //IBMi service plugin
+            for(var i=0; i<16; i++) {
+                var id = "chkbox" + i;
+                $("#"+id).removeAttr("disabled");
+            }
+            //HMC plugin
+            for(var i=16; i<19; i++) {
+                var id = "chkbox" + i;
+                $("#"+id).attr("disabled",true);
+            }
+            //specific partition plugin
+            $("#chkbox19").removeAttr("disabled");
+            //custom sql plugin
+            var counts = $("#custplugin").find("tr").length;
+            for(var i=0; i<counts; i++) {
+                var id = "custchkbox" + i;
+                $("#"+id).removeAttr("disabled");
+            }
+        } else if(type == "HMC") {
+            //IBMi service plugin
+            for(var i=0; i<16; i++) {
+                var id = "chkbox" + i;
+                $("#"+id).attr("disabled",true);
+            }
+            //HMC plugin
+            for(var i=16; i<19; i++) {
+                var id = "chkbox" + i;
+                $("#"+id).removeAttr("disabled");
+            }
+            //specific partition plugin
+            $("#chkbox19").attr("disabled",true);
+            //custom sql plugin
+            var counts = $("#custplugin").find("tr").length;
+            for(var i=0; i<counts; i++) {
+                var id = "custchkbox" + i;
+                $("#"+id).attr("disabled",true);
+            }
+        }
+　　});　　
+});
+</script> 
 
 <h5 class="ul">' . _('Server Details') . '</h5>
 <table class="table table-condensed table-no-border table-auto-width">
@@ -374,7 +422,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
 
                 $output .= '
                 <tr>
-                    <td><input type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control"></td>
+                    <td><input id="chkbox' . $x . '" type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control"></td>
                     <td><input type="text" size="25" name="serviceargs[' . $x . '][name]" value="' . $commandname . '" class="form-control"></td>
                     <td><input type="text" size="35" name="serviceargs[' . $x . '][description]" value="' . $description . '" class="form-control" readonly></td>
                     <td><input type="text" size="50" name="serviceargs[' . $x . '][args]" value="' . $commandargs . '" class="form-control">';
@@ -441,8 +489,15 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $is_service_checked = (isset($services[$x]) ? is_checked($services[$x]) : '');
 
                 $output .= '
-    <tr>
-        <td><input type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control"></td>
+    <tr>';
+                if($x != 19) {
+                    $output .= '
+        <td><input id="chkbox' . $x . '" type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control" disabled="disabled"></td>';
+                } else {
+                    $output .= '
+        <td><input id="chkbox' . $x . '" type="checkbox" class="checkbox" name="services[' . $x . ']" ' . $is_service_checked . ' class="form-control"></td>';
+                }
+                $output .= '
         <td><input type="text" size="25" name="serviceargs[' . $x . '][name]" value="' . $commandname . '" class="form-control"></td>
         <td><input type="text" size="35" name="serviceargs[' . $x . '][description]" value="' . $description . '" class="form-control" readonly></td>
         <td><input type="text" size="100" name="serviceargs[' . $x . '][args]" value="' . $commandargs . '" class="form-control"></td>
@@ -455,7 +510,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
         &nbsp;&nbsp;&nbsp;&nbsp;-PORT - The port number of HMC rest service. Default value is "12443".
     </div>
 </table>
-<p>For the plugin Specific Partition there are some parameters required.<br>
+<p>For the plugin Specific Partition you can check the MHC patition status from IBM i server. And following parameters are required.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-HMCIP - the IP address of the HMC server which current IBM i server belog to.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-FOI - the field of interest. It specifies the field you want to monitor.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-PARNAME - Partition name. The name of the partition you want to check.<br>
@@ -493,7 +548,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
 
             $output .= '<br>
             <h5 class="ul">' . _('Custom Plugin Service') . '</h5>
-<table class="table table-condensed table-no-border table-auto-width" style="margin: 0;">
+<table id="custplugin" class="table table-condensed table-no-border table-auto-width" style="margin: 0;">
     <tr>
         <th></th>
         <th>' . _('Function Id') . '</th>
@@ -506,7 +561,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $is_cust_checked = (isset($cust_services[$x]) ? is_checked($cust_services[$x]) : '');
                 $output .= '
                 <tr>
-                    <td><input type="checkbox" class="checkbox" name="cust_services[' . $x . ']" ' . $is_cust_checked . ' class="form-control"></td>
+                    <td><input id="custchkbox' . $x . '" type="checkbox" class="checkbox" name="cust_services[' . $x . ']" ' . $is_cust_checked . ' class="form-control"></td>
                     <td><input type="text" size="30" name="cust_sql[' . $x . '][id]" id="function_id" value="' . encode_form_val($cust_sql[$x]["id"]) . '" class="form-control" readonly></td>
                     <td><input type="text" size="30" name="cust_sql[' . $x . '][common-name]" id="common-name" value="' . encode_form_val($cust_sql[$x]["common-name"]) . '" class="form-control" readonly></td>
                     <td><input type="text" size="30" name="cust_sql[' . $x . '][type]" id="type" value="' . encode_form_val($cust_sql[$x]["type"]) . '" class="form-control" readonly></td>
@@ -547,7 +602,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             } else {
                 if($server_type == "IBMi") {
                 $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
-                } elseif($server_type == "HMC") {
+                } else if($server_type == "HMC") {
                     $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i hmc ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
                 }
                 exec($command, $ret);
@@ -626,7 +681,6 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             <input type="hidden" name="sst_profile" value="' . encode_form_val($sst_profile) . '">
             <input type="hidden" name="sst_password" value="' . encode_form_val($sst_password) . '">
             <input type="hidden" name="ssl" value="' . encode_form_val($ssl) . '">
-            <input type="hidden" name="server_type" value="' . encode_form_val($server_type) . '">
             <input type="hidden" name="services_serial" value="' . base64_encode(serialize($services)) . '">
             <input type="hidden" name="cust_sql_serial" value="' . base64_encode(serialize($cust_sql)) . '">
             <input type="hidden" name="cust_services_serial" value="' . base64_encode(serialize($cust_services)) . '">
@@ -687,7 +741,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
             $sslargs = "";
             if ($ssl == "on") {
                 $sslargs .= "y";
-            } elseif ($ssl == "off") {
+            } else if ($ssl == "off") {
                 $sslargs .= "n";
             }
 

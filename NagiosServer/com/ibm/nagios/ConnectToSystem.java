@@ -35,7 +35,7 @@ public class ConnectToSystem implements Runnable {
             if (systemName == null) {
                 if (metric.equalsIgnoreCase("DaemonServer")) {    //check daemon server status
                     CheckIBMiStatus check = new CheckIBMiStatus(null, args);
-                    check.run(response);
+                    retval = check.run(response);
                 } else if (metric.equalsIgnoreCase("RefreshProfile")) {//reload HostConfigInfo
                     HostConfigInfo.load();
                 }
