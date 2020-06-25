@@ -20,13 +20,13 @@ import com.ibm.nagios.util.CustomCommand;
 import com.ibm.nagios.util.CustomPluginFactory;
 
 public class CustomSQL implements Action {
-    CommandCall cmd = null;
-    Statement stmt = null;
-
     public CustomSQL() {
     }
 
+    CommandCall cmd = null;
+    
     public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
+        Statement stmt = null;
         ResultSet rs = null;
         int index = 1;    //for multi value's id field
         int count = 0;    //for record result number

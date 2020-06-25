@@ -19,16 +19,20 @@ public class JDBCConnection {
             if (pool == null) {
                 AS400JDBCConnectionPoolDataSource dataSource = new AS400JDBCConnectionPoolDataSource(system, userID, password);
                 dataSource.setSecure(true);
+                dataSource.setSocketTimeout(120000);////(60000 millisec == 1 min)- required  when pool is trying to connect to a system that was shutdown after pool was opened.. in that case without timeout connection will hang
+                dataSource.setThreadUsed(false);
                 pool = new AS400JDBCConnectionPool(dataSource);
-                pool.setMaxLifetime(1000 * 60 * 30);
+                pool.setMaxConnections(30);
                 SecureJDBCPool.put(system, pool);
             }
         } else {
             pool = JDBCPool.get(system);
             if (pool == null) {
                 AS400JDBCConnectionPoolDataSource dataSource = new AS400JDBCConnectionPoolDataSource(system, userID, password);
+                dataSource.setSocketTimeout(120000);
+                dataSource.setThreadUsed(false);
                 pool = new AS400JDBCConnectionPool(dataSource);
-                pool.setMaxConnections(12);
+                pool.setMaxConnections(30);
                 JDBCPool.put(system, pool);
             }
         }
