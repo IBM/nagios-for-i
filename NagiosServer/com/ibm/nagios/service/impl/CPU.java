@@ -50,6 +50,7 @@ public class CPU implements Action {
         } catch (Exception e) {
             response.append(Constants.retrieveDataException + " - " + e.toString());
             CommonUtil.printStack(e.getStackTrace(), response);
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

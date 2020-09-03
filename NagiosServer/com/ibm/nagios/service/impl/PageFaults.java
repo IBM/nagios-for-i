@@ -55,6 +55,7 @@ public class PageFaults implements Action {
             response.setLength(0);
             response.append(Constants.retrieveDataException + " - " + e.toString());
             CommonUtil.printStack(e.getStackTrace(), response);
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

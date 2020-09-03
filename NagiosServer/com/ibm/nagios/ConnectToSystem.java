@@ -26,10 +26,11 @@ public class ConnectToSystem implements Runnable {
     public void run() {
         StringBuffer response = new StringBuffer();
         int retval = Constants.UNKNOWN;
+        HashMap<String, String> args = new HashMap<String, String>();
         try {
             InputStream is = socket.getInputStream();
             ObjectInputStream ois = new ObjectInputStream(is);
-            HashMap<String, String> args = (HashMap<String, String>) ois.readObject();
+            args = (HashMap<String, String>) ois.readObject();
             String systemName = args.get("-H");
             String metric = args.get("-M");
             if (systemName == null) {
@@ -67,7 +68,7 @@ public class ConnectToSystem implements Runnable {
         } catch (Exception e) {
             response.append(Constants.retrieveDataException + " - " + e.toString());
             CommonUtil.printStack(e.getStackTrace(), response);
-            System.err.println("ConnectToSystem - run(): " + e.toString());
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

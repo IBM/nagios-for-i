@@ -41,23 +41,29 @@ public class SpecificJobCPU implements Action {
                 return returnValue;
             }
             stmt = connection.createStatement();
+            //run the sql command first to set the base value
+            rs = stmt.executeQuery("SELECT ELAPSED_CPU_PERCENTAGE FROM TABLE(QSYS2.ACTIVE_JOB_INFO('NO', '', '" + jobName + "', '')) X");
+            //wait 5 seconds, run the SQL command second time to calculate the value of ELAPSED_CPU_PERCENTAG by interval
+            Thread.sleep(5000);
             rs = stmt.executeQuery("SELECT ELAPSED_CPU_PERCENTAGE FROM TABLE(QSYS2.ACTIVE_JOB_INFO('NO', '', '" + jobName + "', '')) X");
             if (rs == null) {
                 response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
                 return returnValue;
             }
+            
             response.append(jobName + " is not active");
-            if (rs.next()) {
+            while (rs.next()) {
                 CPUPercentage = rs.getDouble("ELAPSED_CPU_PERCENTAGE");
 
                 returnValue = CommonUtil.getStatus(CPUPercentage, doubleWarningCap, doubleCriticalCap, returnValue);
                 response.setLength(0);
-                response.append("Job: " + jobName + " CPU: " + CPUPercentage + "% " + " | CPU = " + CPUPercentage + "%;" + doubleWarningCap + ";" + doubleCriticalCap);
+                response.append("Job: ").append(jobName).append(" CPU: ").append(CPUPercentage).append("% ").append(" | CPU = ").append(CPUPercentage).append("%;").append(doubleWarningCap).append(";").append(doubleCriticalCap).append("\n");
                 return returnValue;
             }
         } catch (Exception e) {
             response.append(Constants.retrieveDataException + " - " + e.toString());
             CommonUtil.printStack(e.getStackTrace(), response);
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

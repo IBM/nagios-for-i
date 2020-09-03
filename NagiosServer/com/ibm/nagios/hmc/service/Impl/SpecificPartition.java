@@ -69,7 +69,6 @@ public class SpecificPartition implements Action {
                 		if(method.getName().equalsIgnoreCase("get" + fieldOfInterest)) {
                 			Object value = method.invoke(partition);
                 			if(value instanceof String) {
-                				System.out.println("value=" + value.toString());
                 				if(expectValue.contains(value.toString())) {
                 					returnValue = Constants.OK;
                 				} else {

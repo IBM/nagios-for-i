@@ -77,6 +77,7 @@ public class LongRunSQL implements Action {
             }
             response.append(Constants.retrieveDataException + " - " + errMsg == null ? e.toString() : errMsg);
             CommonUtil.printStack(e.getStackTrace(), response);
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

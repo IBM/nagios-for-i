@@ -56,6 +56,8 @@ public class HostConfigInfo {
                         hosts.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
                     } else if (type.equalsIgnoreCase("sst")) {
                         sst.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
+                    } else if (type.equalsIgnoreCase("hmc")) {
+                    	hmc.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
                     }
                 }
                 HostConfig.save();

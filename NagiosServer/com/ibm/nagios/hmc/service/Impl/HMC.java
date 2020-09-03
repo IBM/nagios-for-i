@@ -23,23 +23,23 @@ public class HMC implements Action {
 
     public int execute(AS400 as400, Map<String, String> args, StringBuffer response) {
         int returnValue = Constants.UNKNOWN;
-
-        String func = args.get("-F");
-        if (func == null) {
-            response.append("The argument -F [function name] is not set");
-            return returnValue;
-        }
-
-        String system = args.get("-HMCIP")==null ? args.get("-H") : args.get("-HMCIP");
-        String user = HostConfigInfo.getHMCUserID(system);
-        if (user == null) {
-            response.append("HMC user profile not set");
-            return returnValue;
-        }
-        String password = Base64Coder.decodeString(HostConfigInfo.getHMCPassword(system));
-        args.put("-U", user);
-        args.put("-P", password);
         try {
+	        String func = args.get("-F");
+	        if (func == null) {
+	            response.append("The argument -F [function name] is not set");
+	            return returnValue;
+	        }
+	
+	        String system = args.get("-HMCIP")==null ? args.get("-H") : args.get("-HMCIP");
+	        String user = HostConfigInfo.getHMCUserID(system);
+	        if (user == null) {
+	            response.append("HMC user profile not set");
+	            return returnValue;
+	        }
+	        String password = Base64Coder.decodeString(HostConfigInfo.getHMCPassword(system));
+	        args.put("-U", user);
+	        args.put("-P", password);
+        
             Action action = ActionFactory.get(func);
             returnValue = action.execute(null, args, response);
             return returnValue;

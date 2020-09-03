@@ -111,7 +111,9 @@ public class CustomSQL implements Action {
                             response.append(custBean.commonName + ": " + value + " | '" + custBean.commonName + "' = " + value + ";" + doubleWarningCap + ";" + doubleCriticalCap);
                         }
                     } else {
-                        response.append("Error: Wrong SQL command format");
+                        response.append("Error: The type of single value only support to select 1 column\n");
+                        response.append("SQL: ").append(custBean.sqlCmd);
+                        return Constants.UNKNOWN;
                     }
                 }
             } else if (custBean.type.equalsIgnoreCase("muti-value") || custBean.type.equalsIgnoreCase("multi-value")) {
@@ -127,7 +129,8 @@ public class CustomSQL implements Action {
                     colName = columns.get(1)[0];
                     colType = columns.get(1)[1];
                 } else {
-                    response.append("Error: Wrong SQL command format");
+                    response.append("Error: The type of multiple value only support to select 1 or 2 columns\n");
+                    response.append("SQL: ").append(custBean.sqlCmd);
                     return Constants.UNKNOWN;
                 }
                 while (rs.next()) {
@@ -197,6 +200,7 @@ public class CustomSQL implements Action {
         } catch (Exception e) {
             response.append(Constants.retrieveDataException + " -  " + e.toString());
             CommonUtil.printStack(e.getStackTrace(), response);
+            CommonUtil.logError(args.get("-H"), this.getClass().getName(), e.getMessage());
             e.printStackTrace();
         } finally {
             try {

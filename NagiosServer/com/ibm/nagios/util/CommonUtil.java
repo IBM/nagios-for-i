@@ -1,7 +1,12 @@
 package com.ibm.nagios.util;
 
-public class CommonUtil {
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+public class CommonUtil {
+	private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
     public static int getStatus(int value, int warningCap, int CriticalCap, int curStatus) {
         //int retVal = StatusConstants.UNKNOWN;
         if (value >= CriticalCap) {
@@ -44,4 +49,11 @@ public class CommonUtil {
             response.append(elements[i]);
         }
     }
+    
+    synchronized public static void logError(String system, String plugin, String errMsg) {
+    	StringBuffer buf = new StringBuffer();
+    	buf.append(format.format(new Date())).append('\t').append(system==null ? "Unknown Host" : system).append('\t').append(plugin).append(": ").append(errMsg);
+    	System.out.println(buf.toString());
+    }
+    
 }
