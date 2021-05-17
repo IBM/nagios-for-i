@@ -12,6 +12,7 @@ import com.ibm.nagios.util.HostConfigInfo;
 
 public class Server {
     public static ExecutorService workers = Executors.newCachedThreadPool();
+    public static boolean SERVER_ACTIVE = false;
 
     @SuppressWarnings("resource")
     public static void main(String args[]) {
@@ -25,7 +26,7 @@ public class Server {
             }
             CustomPluginFactory.load();
             System.out.println("Nagios server initialized successfully");
-            System.setProperty("com.ibm.as400.access.AS400.guiAvailable", "false");
+            Server.SERVER_ACTIVE = true;
             while (true) {
                 Socket socket = serverSocket.accept();
                 workers.execute(new ConnectToSystem(socket)); //start thread to get as400 connection

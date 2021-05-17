@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.ibm.as400.access.AS400JDBCConnectionPool;
 import com.ibm.as400.access.AS400JDBCConnectionPoolDataSource;
 import com.ibm.as400.access.ConnectionPoolException;
+import com.ibm.nagios.Server;
 
 public class JDBCConnection {
     private static ConcurrentHashMap<String, AS400JDBCConnectionPool> JDBCPool = new ConcurrentHashMap<String, AS400JDBCConnectionPool>();
@@ -19,7 +20,9 @@ public class JDBCConnection {
     static {
     	//init the timer to reset the JDBC connection pool
     	//to resolve issue caused by ERROR SQL0519 prepared statement in use
-    	jdbcConnPoolResetTimer();
+		if(Server.SERVER_ACTIVE) {
+			jdbcConnPoolResetTimer();
+		}
     }
     
     public synchronized Connection getJDBCConnection(String system, String userID, String password, String ssl) throws ConnectionPoolException {
