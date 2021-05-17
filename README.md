@@ -31,10 +31,27 @@ The plugins suport to mornitor following martix<br>
   DaemonServer      Retrieve the daemon server status<br>
 </pre>
 
-## Installation and upgrade
-<p>For the version of Nagios Core, you could install the latest plugins by service pack in directory <b><i>service pack</i></b>.<br>
-You could take <i>Nagios Plugin for IBM i Install and Configure Guidelines.txt</i> for detail steps.
-</p>
-<br>
-<p>For the version of Nagios XI, the plugin for IBM i has already been integrated in XI. You could update the plugins by install the latest wizard file in <b><i>Wizard for NagiosXI/ibmiservice.zip</i></b>.</p>
-<br>
+## Installation and upgrade<br>
+
+# Nagios Core
+
+For the version of Nagios Core, you could install the latest plugins by service pack in directory **service pack**.<br>
+You could take *Nagios Plugin for IBM i Install and Configure Guidelines.txt* for detail steps.<br>
+
+# Nagios XI
+
+The wizards for monitoring IBM i should be installed in the base shipment for Nagios XI (As of Jan 2021 this is not the case). To update or
+install the plugins you should do the following.<br>
+
+- Download the Wizards and store locally<br>
+	- [ibmiserice.zip](https://github.com/IBM/nagios-for-i/blob/master/Wizard%20for%20NagiosXI/ibmiservice.zip)<br>
+	- [ibmicustomsql.zip](https://github.com/IBM/nagios-for-i/blob/master/Wizard%20for%20NagiosXI/ibmicustomsql.zip)<br>
+- Open the web interface.<br>
+	- Select the Admin page<br>
+	- Select Manage Config Wizards (left hand column of links)<br> 
+	- Select Browse to select the zip file
+	- Select the Upload and Install button to install the Wizard
+	
+The wizards should now be available to monitoring the IBM i.
+
+Information from Nagios about installing wizards which has a lot more information can be found [here](https://assets.nagios.com/downloads/nagiosxi/docs/Installing-Nagios-XI-Configuration-Wizards.pdf).
