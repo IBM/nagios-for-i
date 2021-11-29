@@ -31,7 +31,7 @@ public class SpecificPartition implements Action {
         // used for certificate verify
         String ksPass = args.get("-KSPASS");
         String port = args.get("-PORT");
-        String hmcIpAddr = args.get("-HMCIP");		//HMC IP address
+        String hmcIpAddr = args.get("-H");			//HMC IP address
         String user = args.get("-U");				//HMC user
         String password = args.get("-P");			//HMC password
         String fieldOfInterest = args.get("-FOI");	//field of interest

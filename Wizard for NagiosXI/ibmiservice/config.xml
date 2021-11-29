@@ -12,6 +12,7 @@
 		<plugin filename="server_start.sh" />
 		<plugin filename="server_stop.sh" />
 		<plugin filename="jt400.jar" />
+		<plugin filename="gson.jar" />
 		<plugin filename="nagios4i.jar" />
 	</plugins>
 	<logos>

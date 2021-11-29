@@ -13,7 +13,7 @@ function ibm_i_service_configwizard_init()
     $name = "ibm-i-service";
     $args = array(
         CONFIGWIZARD_NAME => $name,
-        CONFIGWIZARD_VERSION => "1.0.1",
+        CONFIGWIZARD_VERSION => "1.0.2",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
         CONFIGWIZARD_DESCRIPTION => _("Monitor an IBM i server"),
         CONFIGWIZARD_DISPLAYTITLE => "IBM i service",
@@ -307,12 +307,12 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $("#"+id).removeAttr("disabled");
             }
             //HMC plugin
-            for(var i=16; i<19; i++) {
+            for(var i=16; i<=19; i++) {
                 var id = "chkbox" + i;
                 $("#"+id).attr("disabled",true);
             }
             //specific partition plugin
-            $("#chkbox19").removeAttr("disabled");
+            // $("#chkbox19").removeAttr("disabled");
             //custom sql plugin
             var counts = $("#custplugin").find("tr").length;
             for(var i=0; i<counts; i++) {
@@ -326,12 +326,12 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $("#"+id).attr("disabled",true);
             }
             //HMC plugin
-            for(var i=16; i<19; i++) {
+            for(var i=16; i<=19; i++) {
                 var id = "chkbox" + i;
                 $("#"+id).removeAttr("disabled");
             }
             //specific partition plugin
-            $("#chkbox19").attr("disabled",true);
+            // $("#chkbox19").attr("disabled",true);
             //custom sql plugin
             var counts = $("#custplugin").find("tr").length;
             for(var i=0; i<counts; i++) {
@@ -511,7 +511,6 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
     </div>
 </table>
 <p>For the plugin Specific Partition you can check the MHC patition status from IBM i server. And following parameters are required.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;-HMCIP - the IP address of the HMC server which current IBM i server belog to.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-FOI - the field of interest. It specifies the field you want to monitor.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-PARNAME - Partition name. The name of the partition you want to check.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;-EXPVAL - Expect value. The expect value of the interested field. It will compare the value returned from server and the expect value to report the status.</p>';

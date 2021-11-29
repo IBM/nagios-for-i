@@ -30,7 +30,7 @@ public class HMC implements Action {
 	            return returnValue;
 	        }
 	
-	        String system = args.get("-HMCIP")==null ? args.get("-H") : args.get("-HMCIP");
+	        String system = args.get("-H");
 	        String user = HostConfigInfo.getHMCUserID(system);
 	        if (user == null) {
 	            response.append("HMC user profile not set");

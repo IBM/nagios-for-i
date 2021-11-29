@@ -12,7 +12,7 @@ public class RequestHandler {
     public RequestHandler() {
     }
 
-    synchronized public int process(AS400 as400, Map<String, String> args, StringBuffer response) throws Exception {
+    public int process(AS400 as400, Map<String, String> args, StringBuffer response) throws Exception {
         return CollectStatus(as400, args, response);
     }
 
