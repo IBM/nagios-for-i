@@ -11,7 +11,6 @@ public class ActionFactory {
         try {
             actionInstance = (Action) Class.forName(className).getConstructor(null).newInstance();
         } catch (ClassNotFoundException e) {
-        	System.err.println(e.getMessage());
             className = "com.ibm.nagios.hmc.service.Impl" + "." + action;
             actionInstance = (Action) Class.forName(className).getConstructor(null).newInstance();
         }
