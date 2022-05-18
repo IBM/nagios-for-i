@@ -252,10 +252,10 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                         $serviceargs_default[$x]['args'] = '';
                         $serviceargs_default[$x]['name'] = 'Basic Information';
                     } else if ($x == 13) {
-                        $serviceargs_default[$x]['description'] = 'Sepecific Message';
+                        $serviceargs_default[$x]['description'] = 'Specific Message';
                         $serviceargs_default[$x]['metric'] = 'SpecificMessage';
                         $serviceargs_default[$x]['args'] = '-i CPF*';
-                        $serviceargs_default[$x]['name'] = 'Sepecific Message';
+                        $serviceargs_default[$x]['name'] = 'Specific Message';
                     } else if ($x == 14) {
                         $serviceargs_default[$x]['description'] = 'Top N Temporary Storage Jobs';
                         $serviceargs_default[$x]['metric'] = 'TempStorageJobs';
