@@ -55,3 +55,4 @@ install the plugins you should do the following.<br>
 The wizards should now be available to monitoring the IBM i.
 
 Information from Nagios about installing wizards which has a lot more information can be found [here](https://assets.nagios.com/downloads/nagiosxi/docs/Installing-Nagios-XI-Configuration-Wizards.pdf).
+
