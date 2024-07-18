@@ -1,4 +1,8 @@
 # nagios-for-i
+
+> [!WARNING]  
+> This package is currently no longer supported or maintained. The repository has been archived to reflect this status and may be unarchived if it becomes actively maintained in the future
+
 ## Description
 Nagios provides enterprise-class Open Source IT monitoring, network monitoring, server and applications monitoring.<br>
 We provide several customized plugin for monitoring IBM i systems.<br>
