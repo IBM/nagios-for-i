@@ -35,7 +35,8 @@ public class CPU implements Action {
                 return returnValue;
             }
             stmt = connection.createStatement();
-            rs = stmt.executeQuery("SELECT AVERAGE_CPU_UTILIZATION FROM QSYS2.SYSTEM_STATUS_INFO");
+            // CPU info is now in SYSTEM_ACTIVITY_INFO
+            rs = stmt.executeQuery("SELECT AVERAGE_CPU_UTILIZATION FROM TABLE(QSYS2.SYSTEM_ACTIVITY_INFO())");
             if (rs == null) {
                 response.append(Constants.retrieveDataError + " - " + "Cannot retrieve data from server");
                 return returnValue;

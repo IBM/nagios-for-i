@@ -25,7 +25,6 @@ import com.ibm.nagios.util.Constants;
 public class HostConfig {
     private final static String OLD_DIRECTORY = "/usr/local/nagios/";
     private final static String NEW_DIRECTORY = "/usr/local/nagios/var/";//change the directory for XI permission problem
-//    private final static String NEW_DIRECTORY = "/Users/zhangyan/Workspace/Documents/Nagios/";
     private final static String FILENAME = "Nagios.host.java.config.ser";
     private static HashMap<String, HashMap<String, UserInfo>> cache = new HashMap<String, HashMap<String, UserInfo>>();
     private static HashMap<String, UserInfo> hosts;
