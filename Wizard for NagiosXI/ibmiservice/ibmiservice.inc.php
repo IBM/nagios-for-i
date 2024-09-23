@@ -13,7 +13,7 @@ function ibm_i_service_configwizard_init()
     $name = "ibm-i-service";
     $args = array(
         CONFIGWIZARD_NAME => $name,
-        CONFIGWIZARD_VERSION => "1.0.2",
+        CONFIGWIZARD_VERSION => "1.0.3",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
         CONFIGWIZARD_DESCRIPTION => _("Monitor an IBM i server"),
         CONFIGWIZARD_DISPLAYTITLE => "IBM i service",
@@ -600,7 +600,7 @@ function ibm_i_service_configwizard_func($mode = "", $inargs = null, &$outargs, 
                 $errmsg[$errors++] = _("User profile or password not specified.");
             } else {
                 if($server_type == "IBMi") {
-                $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
+                    $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i host ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
                 } else if($server_type == "HMC") {
                     $command = 'export DYLD_LIBRARY_PATH="";java -cp /usr/local/nagios/libexec/jt400.jar:/usr/local/nagios/libexec/nagios4i.jar com.ibm.nagios.config.HostConfig -i hmc ' . escapeshellarg($address) . ' ' . escapeshellarg($usr_profile) . ' ' . escapeshellarg($usr_password);
                 }

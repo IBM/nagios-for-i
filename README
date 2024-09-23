@@ -26,6 +26,7 @@ COMMANDS
 ---------------------------
 The commands automatic initialization only available for Nagios Core for now. For Naigos XI, users can only initialize the commands manually using the Nagios XI's CCM(Core Config Manager) GUI interface.
 Notice that the parameter -M is case sensitive
+The command "check-ibmi-disk-config" is only supported in releases prior to 7.5.
 
 command_name    check-ibmi-cpu-utilization
 command_line	/bin/bash $USER1$/check_ibmi_status.sh -M CPU -H $HOSTADDRESS$ -W $ARG1$ -C $ARG2$

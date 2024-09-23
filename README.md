@@ -11,16 +11,16 @@ You could refer to the [this link](https://www.ibm.com/support/pages/node/127429
 The nagios plugin for i has two methods. 
 * You can run the plugin with a daemon server to handle and dispatch the request to worker thread.<br>
 You could start the daemon server by script server_start.sh.
-* You can also run the plugin without the server. Then every request will be handled by seperate processes. It would be more simple but consumes more resources.
+* You can also run the plugin without the server. Then every request will be handled by separate processes. It would be more simple but consumes more resources.
 <br>
-The plugins suport to mornitor following martix<br>
+The plugins support to monitor following matrix<br>
 <br>
 <pre>
-  <b>plugin            martix</b><br>
+  <b>plugin            matrix</b><br>
   CPU               Retrieve the CPU utilization for the entire system<br>
   SpecificJobCPU    Retrieve the CPU usage for a specific job<br>
   DiskUsage         Retrieve the disk usage status<br>
-  DiskConfig        Retrieve the disk health status<br>
+  DiskConfig*       Retrieve the disk health status<br>
   ASPUsage          Retrieve the ASP usage percentage of the entire system<br>
   ActiveJobs        Retrieve the number of active jobs on the system<br>
   BasicInfo         Retrieve the basic information of an IBM i system<br>
@@ -34,7 +34,9 @@ The plugins suport to mornitor following martix<br>
   TempStorageJobs   Retrieve top N jobs that have the most temp storage usage<br>
   DaemonServer      Retrieve the daemon server status<br>
 </pre>
-
+<br>
+* DiskConfig is no longer supported in 7.5 and beyond.<br>
+<br>
 ## Installation and upgrade<br>
 
 # Nagios Core
@@ -48,7 +50,7 @@ The wizards for monitoring IBM i should be installed in the base shipment for Na
 install the plugins you should do the following.<br>
 
 - Download the Wizards and store locally<br>
-	- [ibmiserice.zip](https://github.com/IBM/nagios-for-i/blob/master/Wizard%20for%20NagiosXI/ibmiservice.zip)<br>
+	- [ibmiservice.zip](https://github.com/IBM/nagios-for-i/blob/master/Wizard%20for%20NagiosXI/ibmiservice.zip)<br>
 	- [ibmicustomsql.zip](https://github.com/IBM/nagios-for-i/blob/master/Wizard%20for%20NagiosXI/ibmicustomsql.zip)<br>
 - Open the web interface.<br>
 	- Select the Admin page<br>

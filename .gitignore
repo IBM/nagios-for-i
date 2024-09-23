@@ -1,3 +1,6 @@
 .DS_Store
 
 ./NagiosServer/output
+.metadata
+.vscode
+bin
