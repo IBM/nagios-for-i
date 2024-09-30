@@ -178,24 +178,26 @@ public class HostConfig {
             //if the old ser file exists, copy the content to new ser file
             File oldFile = new File(OLD_DIRECTORY + FILENAME);
             if (oldFile.exists()) {
-                InputStream bis = new BufferedInputStream(new FileInputStream(oldFile));
-                GZIPInputStream gzis = new GZIPInputStream(bis);
-                ObjectInputStream ois = new ObjectInputStream(gzis);
-                cache = (HashMap<String, HashMap<String, UserInfo>>) ois.readObject();
-                hosts = cache.get("host");
-                sst = cache.get("sst");
-                hmc = cache.get("hmc");
-                ois.close();
+                try (InputStream bis = new BufferedInputStream(new FileInputStream(oldFile));
+                     GZIPInputStream gzis = new GZIPInputStream(bis);
+                     ObjectInputStream ois = new ObjectInputStream(gzis)) {
+                        cache = (HashMap<String, HashMap<String, UserInfo>>) ois.readObject();
+                        hosts = cache.get("host");
+                        sst = cache.get("sst");
+                        hmc = cache.get("hmc");
+                        ois.close();
+                }
             }
             save();
             file.setReadable(true, false);    //set authority to 666
             file.setWritable(true, false);
             file.setExecutable(false, false);
         }
-        InputStream bis = new BufferedInputStream(new FileInputStream(file));
-        GZIPInputStream gzis = new GZIPInputStream(bis);
-        ObjectInputStream ois = new ObjectInputStream(gzis);
-        cache = (HashMap<String, HashMap<String, UserInfo>>) ois.readObject();
+        try (InputStream bis = new BufferedInputStream(new FileInputStream(file));
+             GZIPInputStream gzis = new GZIPInputStream(bis);
+             ObjectInputStream ois = new ObjectInputStream(gzis)) {
+                cache = (HashMap<String, HashMap<String, UserInfo>>) ois.readObject();
+        }
         hosts = cache.get("host");
         sst = cache.get("sst");
         hmc = cache.get("hmc");
@@ -210,20 +212,19 @@ public class HostConfig {
             hmc = new HashMap<String, UserInfo>();
         }
 
-        ois.close();
         return true;
     }
 
     public static boolean save() throws IOException {
-        FileOutputStream fos = new FileOutputStream(NEW_DIRECTORY + FILENAME);
-        GZIPOutputStream gzos = new GZIPOutputStream(fos);
-        ObjectOutputStream oos = new ObjectOutputStream(gzos);
-        cache.put("host", hosts);
-        cache.put("sst", sst);
-        cache.put("hmc", hmc);
-        oos.writeObject(cache);
-        oos.flush();
-        oos.close();
+        try (FileOutputStream fos = new FileOutputStream(NEW_DIRECTORY + FILENAME);
+             GZIPOutputStream gzos = new GZIPOutputStream(fos);
+             ObjectOutputStream oos = new ObjectOutputStream(gzos)) {
+                cache.put("host", hosts);
+                cache.put("sst", sst);
+                cache.put("hmc", hmc);
+                oos.writeObject(cache);
+                oos.flush();
+        }
         return true;
     }
 
@@ -283,13 +284,11 @@ public class HostConfig {
     }
 
     private static void refreshProfile() {
-        try {
-            Socket socket = new Socket(Constants.SERVER, Constants.PORT);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            HashMap<String, String> argsMap = new HashMap<String, String>();
-            argsMap.put("-M", "RefreshProfile");
-            oos.writeObject(argsMap);
-            socket.close();
+        try (Socket socket = new Socket(Constants.SERVER, Constants.PORT);
+             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream())) {
+                HashMap<String, String> argsMap = new HashMap<String, String>();
+                argsMap.put("-M", "RefreshProfile");
+                oos.writeObject(argsMap);
         } catch (Exception e) {
             //The daemon server might not active
         }

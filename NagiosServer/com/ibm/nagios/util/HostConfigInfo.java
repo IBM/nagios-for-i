@@ -29,39 +29,39 @@ public class HostConfigInfo {
             //bulk load: load profile information from profile.csv
             File customUserProfile = new File(CUST_PROFILE);
             if (customUserProfile.isFile() && customUserProfile.exists()) {
-                InputStreamReader read = new InputStreamReader(
+                try (InputStreamReader read = new InputStreamReader(
                         new FileInputStream(customUserProfile), "UTF-8");
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String line = null;
-                String system = null;
-                String user = null;
-                String pwd = null;
-                String type = null;
-                while ((line = bufferedReader.readLine()) != null) {
-                    line = line.trim();
-                    if (line.startsWith("#") == true) {
-                        continue;
-                    }
-                    String[] elem = line.split("[,;]");
-                    if (elem.length != 4) {
-                        System.err.println("HostConfig-load(): bad format of profile.csv");
-                        bufferedReader.close();
-                        return true;//DO NOT let the loading failure stop the server initialization
-                    }
-                    system = elem[0];
-                    user = elem[1];
-                    pwd = elem[2];
-                    type = elem[3];
-                    if (type.equalsIgnoreCase("host")) {
-                        hosts.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
-                    } else if (type.equalsIgnoreCase("sst")) {
-                        sst.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
-                    } else if (type.equalsIgnoreCase("hmc")) {
-                    	hmc.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
-                    }
+                     BufferedReader bufferedReader = new BufferedReader(read)) {
+                        String line = null;
+                        String system = null;
+                        String user = null;
+                        String pwd = null;
+                        String type = null;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            line = line.trim();
+                            if (line.startsWith("#") == true) {
+                                continue;
+                            }
+                            String[] elem = line.split("[,;]");
+                            if (elem.length != 4) {
+                                System.err.println("HostConfig-load(): bad format of profile.csv");
+                                bufferedReader.close();
+                                return true;//DO NOT let the loading failure stop the server initialization
+                            }
+                            system = elem[0];
+                            user = elem[1];
+                            pwd = elem[2];
+                            type = elem[3];
+                            if (type.equalsIgnoreCase("host")) {
+                                hosts.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
+                            } else if (type.equalsIgnoreCase("sst")) {
+                                sst.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
+                            } else if (type.equalsIgnoreCase("hmc")) {
+                                hmc.put(system, new UserInfo(user, Base64Coder.encodeString(pwd)));
+                            }
+                        }
+                        HostConfig.save();
                 }
-                HostConfig.save();
-                bufferedReader.close();
             }
             return true;
         } catch (Exception e) {
