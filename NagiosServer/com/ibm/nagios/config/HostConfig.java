@@ -185,7 +185,6 @@ public class HostConfig {
                         hosts = cache.get("host");
                         sst = cache.get("sst");
                         hmc = cache.get("hmc");
-                        ois.close();
                 }
             }
             save();
@@ -197,10 +196,10 @@ public class HostConfig {
              GZIPInputStream gzis = new GZIPInputStream(bis);
              ObjectInputStream ois = new ObjectInputStream(gzis)) {
                 cache = (HashMap<String, HashMap<String, UserInfo>>) ois.readObject();
+                hosts = cache.get("host");
+                sst = cache.get("sst");
+                hmc = cache.get("hmc");
         }
-        hosts = cache.get("host");
-        sst = cache.get("sst");
-        hmc = cache.get("hmc");
 
         if (hosts == null) {
             hosts = new HashMap<String, UserInfo>();
