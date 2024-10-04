@@ -18,6 +18,7 @@ fi
 if [ ! -f /usr/local/nagios/var/profile.csv ] ; then
 	cp $BASEDIR/profile.csv  /usr/local/nagios/var
 	chmod 666 /usr/local/nagios/var/profile.csv
+	/bin/bash /usr/local/nagios/libexec/ibmi_profile_init.sh
 fi
 
 # handle file /usr/local/nagios/var/Nagios.host.java.config.ser

@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.ibm.nagios.util.HostConfigInfo;
+
 /*
  * used for initializing Nagios core configuration files.
  */
@@ -17,9 +19,19 @@ public class Initialization {
     private final static String COMMANDS = "commands";
     private final static String LOCALHOST = "localhost";
     private static final String TEMPLATES = "templates";
+    private final static String PROFILE_INIT = "profile_init";
 
     public static void main(String[] args) {
         try {
+            // Called when Nagios XI plugin is imported.
+            if (args.length == 1 && args[0].equalsIgnoreCase(PROFILE_INIT)) {
+                if (HostConfigInfo.loadProfiles()) {
+                    System.out.println("Host profiles successfully loaded from profile.csv.");
+                } else {
+                    System.out.println("Host profiles failed to load from profile.csv.");
+                }
+                return;
+            }
             File cmdCfg = new File(OBJECTS + COMMANDS_CFG);
             if (cmdCfg.exists()) {
                 updateCmdCfg(cmdCfg, COMMANDS);
