@@ -22,22 +22,23 @@ public class CheckDaemonStatus {
             socket = new Socket(Constants.SERVER, Constants.PORT);
             socket.setReuseAddress(true);
             socket.setSoLinger(true, 0);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject(argsMap);
-            socket.shutdownOutput();
-
-            InputStream is = socket.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String result = null;
-            if ((result = br.readLine()) != null) {
-                String message;
-                while ((message = br.readLine()) != null) {
-                    System.out.println(message);
-                }
-                retValue = Integer.parseInt(result);
+            try (ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                 InputStream is = socket.getInputStream();
+                 BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                    oos.writeObject(argsMap);
+                    socket.shutdownOutput();
+                    String result = null;
+                    if ((result = br.readLine()) != null) {
+                        String message;
+                        while ((message = br.readLine()) != null) {
+                            System.out.println(message);
+                        }
+                        retValue = Integer.parseInt(result);
+                    }
             }
         } catch (IOException e) {
             System.out.println("Daemon server went wrong\nPlease restart the server");
+            e.printStackTrace();
         } finally {
             try {
                 if (socket != null) {

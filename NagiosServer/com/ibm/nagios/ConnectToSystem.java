@@ -82,17 +82,15 @@ public class ConnectToSystem implements Runnable {
     }
 
     void PrintResponse(Integer retVal, StringBuffer response) throws IOException {
-        OutputStream os = socket.getOutputStream();
-        PrintWriter pw = new PrintWriter(os);
-        if (retVal != null) {
-            pw.write(retVal + "\n");
-        } else {
-            pw.write(Integer.toString(Constants.UNKNOWN) + "\n");
+        try (OutputStream os = socket.getOutputStream();
+             PrintWriter pw = new PrintWriter(os)) {
+                if (retVal != null) {
+                    pw.write(retVal + "\n");
+                } else {
+                    pw.write(Integer.toString(Constants.UNKNOWN) + "\n");
+                }
+                pw.write(response.toString());
+                pw.flush();
         }
-        pw.write(response.toString());
-        pw.flush();
-
-        pw.close();
-        os.close();
     }
 }

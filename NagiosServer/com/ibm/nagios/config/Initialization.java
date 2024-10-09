@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.ibm.nagios.util.HostConfigInfo;
+
 /*
  * used for initializing Nagios core configuration files.
  */
@@ -17,9 +19,19 @@ public class Initialization {
     private final static String COMMANDS = "commands";
     private final static String LOCALHOST = "localhost";
     private static final String TEMPLATES = "templates";
+    private final static String PROFILE_INIT = "profile_init";
 
     public static void main(String[] args) {
         try {
+            // Called when Nagios XI plugin is imported.
+            if (args.length == 1 && args[0].equalsIgnoreCase(PROFILE_INIT)) {
+                if (HostConfigInfo.loadProfiles()) {
+                    System.out.println("Host profiles successfully loaded from profile.csv.");
+                } else {
+                    System.out.println("Host profiles failed to load from profile.csv.");
+                }
+                return;
+            }
             File cmdCfg = new File(OBJECTS + COMMANDS_CFG);
             if (cmdCfg.exists()) {
                 updateCmdCfg(cmdCfg, COMMANDS);
@@ -64,9 +76,9 @@ public class Initialization {
             if (!initFlag) {
                 StringBuilder commands = new StringBuilder();
                 InitCommands(commands);
-                FileWriter writer = new FileWriter(cfgFile, true);
-                writer.write(commands.toString());
-                writer.close();
+                try (FileWriter writer = new FileWriter(cfgFile, true)) {
+                    writer.write(commands.toString());
+                }
                 System.out.println("The commands.cfg initialized successfully");
             }
         } else if (type.equalsIgnoreCase("localhost")) {
@@ -79,9 +91,9 @@ public class Initialization {
             if (!initFlag) {
                 StringBuilder daemon = new StringBuilder();
                 InitDaemon(daemon);
-                FileWriter writer = new FileWriter(cfgFile, true);
-                writer.write(daemon.toString());
-                writer.close();
+                try (FileWriter writer = new FileWriter(cfgFile, true)) {
+                    writer.write(daemon.toString());
+                }
                 System.out.println("The localhost.cfg initialized successfully");
             }
         } else if (type.equalsIgnoreCase("templates")) {
@@ -94,9 +106,9 @@ public class Initialization {
             if (!initFlag) {
                 StringBuilder template = new StringBuilder();
                 InitTemplate(template);
-                FileWriter writer = new FileWriter(cfgFile, true);
-                writer.write(template.toString());
-                writer.close();
+                try (FileWriter writer = new FileWriter(cfgFile, true)) {
+                    writer.write(template.toString());
+                }
                 System.out.println("The templates.cfg initialized successfully");
             }
         }

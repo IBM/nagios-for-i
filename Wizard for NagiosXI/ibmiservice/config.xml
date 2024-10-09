@@ -8,6 +8,7 @@
 		<plugin filename="check_version.sh" />
 		<plugin filename="host_config.sh" />
 		<plugin filename="ibmi_init.sh" />
+		<plugin filename="ibmi_profile_init.sh" />
 		<plugin filename="server_restart.sh" />
 		<plugin filename="server_start.sh" />
 		<plugin filename="server_stop.sh" />
