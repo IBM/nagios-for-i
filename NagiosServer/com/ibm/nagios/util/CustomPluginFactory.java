@@ -42,10 +42,10 @@ public class CustomPluginFactory {
         String sqlCmd = null;
         String warning = null;
         String critical = null;
-        ArrayList<CustomCommand> preCmd = new ArrayList<CustomCommand>();
-        ArrayList<CustomCommand> postCmd = new ArrayList<CustomCommand>();
 
         for (int i = 0; i < list.getLength(); i++) {
+            ArrayList<CustomCommand> preCmd = new ArrayList<CustomCommand>();
+            ArrayList<CustomCommand> postCmd = new ArrayList<CustomCommand>();
             node = list.item(i);
             funcId = node.getAttributes().getNamedItem("id").getNodeValue().toLowerCase();
 

@@ -13,7 +13,7 @@ function ibm_i_customsql_configwizard_init()
     $name = "ibm-i-customsql";
     $args = array(
         CONFIGWIZARD_NAME => $name,
-        CONFIGWIZARD_VERSION => "1.0.0",
+        CONFIGWIZARD_VERSION => "1.0.1",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
         CONFIGWIZARD_DESCRIPTION => _("Configure Custom SQL commands for IBM i monitoring."),
         CONFIGWIZARD_DISPLAYTITLE => "IBM i Custom SQL",
@@ -55,16 +55,25 @@ function ibm_i_customsql_configwizard_func($mode = "", $inargs = null, &$outargs
             <p><font size=3>This wizard is used to manage IBM i Custom SQL commands.</font></p>
             <p>You can customize your own commands by leveraging SQL statements. Below are 5 items that you must configure to create your own commands.</p>
             <ul>
-                <li>Function Id</li><p>The unique indentifier of your command. Please do not use blank or other special characters for this id.</p>
+                <li>Function Id</li><p>The unique identifier of your command. Please do not use blank or other special characters for this id.</p>
                 <li>Description</li><p>The description for your command.</p>
                 <li>Type</li>
                 <p>single value: If you choose this type, you must make sure that your SQL statement only return a single value (one row of one column).</p>
                 <p>multiple value: multiple value: If you choose this type, your SQL statement could return values from one or two columns.<br>
-                If the SQL returns one colunm, the data type of the column returned should be INTEGER or DECIMAL.<br>
-                If the SQL returns two colunms, the data type of the first column should be VARCHAR, and the data type of the second column should be INTEGER or DECIMAL.</p>
+                If the SQL returns one column, the data type of the column returned should be INTEGER or DECIMAL.<br>
+                If the SQL returns two columns, the data type of the first column should be VARCHAR, and the data type of the second column should be INTEGER or DECIMAL.</p>
                 <p>list: You could specify as much returning columns/rows as you want. All the returning data will be displayed.</p>
                 <li>Thresholds</li><p>The thresholds of your expecting value.</p>
-                <li>SQL Command</li><p>The SQL command used to get the data from IBM i server.</p>
+                <li>SQL Command</li>
+                <p>The first input field is the actual SQL command that will be ran to get information from the IBM i system. 
+                It is the output of this command which will be checked against the threshold values. <br>
+                This field is required.</p>
+                <p>The second input field is the pre-command. It can either be a CL command or an SQL service. This will be executed
+                prior to the SQL Command. Its output will not be checked, but if it fails to execute, the service will show the failure. <br>
+                This field is not required.</p>
+                <p>The third input field is the post-command. It can either be a CL command or an SQL service. This will be executed
+                after the SQL Command. Its output will not be checked, but if it fails to execute, the service will show the failure. <br>
+                This field is not required.</p>
             </ul>
             ';
             

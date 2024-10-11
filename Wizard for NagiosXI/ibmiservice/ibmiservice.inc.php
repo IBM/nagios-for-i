@@ -13,7 +13,7 @@ function ibm_i_service_configwizard_init()
     $name = "ibm-i-service";
     $args = array(
         CONFIGWIZARD_NAME => $name,
-        CONFIGWIZARD_VERSION => "1.0.3",
+        CONFIGWIZARD_VERSION => "1.0.4",
         CONFIGWIZARD_TYPE => CONFIGWIZARD_TYPE_MONITORING,
         CONFIGWIZARD_DESCRIPTION => _("Monitor an IBM i server"),
         CONFIGWIZARD_DISPLAYTITLE => "IBM i service",
