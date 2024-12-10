@@ -2,6 +2,10 @@
 
 > [!WARNING]  
 > This package is currently no longer supported or maintained. The repository has been archived to reflect this status and may be unarchived if it becomes actively maintained in the future
+>
+> If you are looking for actively supported Nagios integration, you are invited to explore products in the IBM i ecosystem, for instance:
+> - [AAG](https://www.shieldadvanced.com/AAG.php) from [Shield Advanced](https://www.shieldadvanced.com/)
+> - [Control for i](https://www.m81.eu/control-for-i/) from [m81](https://www.m81.eu/)
 
 ## Description
 Nagios provides enterprise-class Open Source IT monitoring, network monitoring, server and applications monitoring.<br>
